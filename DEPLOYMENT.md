@@ -1,10 +1,11 @@
 # Cloudflare Pages 部署指南
 
-## 方式一：通过 Git 集成部署（推荐）
+## 在 Cloudflare Pages 上部署
 
 ### 1. 推送代码到 GitHub
 
 ```bash
+git init
 git add .
 git commit -m "Initial commit"
 git remote add origin <your-github-repo-url>
@@ -14,77 +15,88 @@ git push -u origin main
 ### 2. 在 Cloudflare Pages 中创建项目
 
 1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)
-2. 进入 **Pages** > **Create application**
+2. 进入 **Workers & Pages** > **Create application** > **Pages**
 3. 选择 **Connect to Git**
-4. 选择你的 GitHub 仓库
+4. 选择你的 GitHub 仓库并授权
 5. 配置构建设置：
-   - **构建命令**: `npm run build`
-   - **输出目录**: `.svelte-kit/output/client`
+
+| 配置项 | 值 |
+|--------|-----|
+| **Project name** | `models-page`（或自定义名称）|
+| **Production branch** | `main` |
+| **Framework preset** | `None` |
+| **Build command** | `npm run build` |
+| **Build output directory** | `.svelte-kit/output/client` |
+
 6. 点击 **Save and Deploy**
 
-### 3. 环境变量（如需要）
+### 3. 环境变量（可选）
 
-在 **Settings** > **Environment variables** 中添加任何需要的环境变量。
+如果需要，在 **Settings** > **Environment variables** 中添加：
+- Production
+- Preview
+- Deployment
 
-## 方式二：通过 Wrangler CLI 部署
+## 构建说明
 
-### 1. 登录 Cloudflare
+项目使用 `@sveltejs/adapter-cloudflare` 适配器，它会：
 
-```bash
-npx wrangler login
-```
+1. 将静态资源生成到 `.svelte-kit/output/client`
+2. 将服务器代码编译为 Cloudflare Pages Function
+3. 自动复制 worker 文件到输出目录
 
-### 2. 使用部署脚本
+构建命令会自动处理：
+- ✅ 复制 `_worker.js`（Cloudflare Pages Function）
+- ✅ 复制 `_headers`（HTTP 头配置）
+- ✅ 复制 `_routes.json`（路由配置）
+- ✅ 复制 `sitemap.xml`（站点地图）
+- ✅ 复制 `models.json`（模型数据）
+- ✅ 复制 `robots.txt`（爬虫配置）
 
-```bash
-chmod +x deploy-cloudflare.sh
-./deploy-cloudflare.sh
-```
+## 验证部署
 
-或者手动部署：
-
-```bash
-npm run build
-npx wrangler pages deploy .svelte-kit/output/client --project-name=models-page
-```
-
-### 3. 创建 Pages 项目（首次部署时）
-
-如果需要手动创建项目：
-
-```bash
-npx wrangler pages project create models-page
-```
-
-## 注意事项
-
-1. **构建输出**: `adapter-cloudflare` 会将静态文件输出到 `.svelte-kit/output/client`，服务器代码输出到 `.svelte-kit/output/server`
-
-2. **路由**: Cloudflare Pages 会自动处理 SvelteKit 的路由
-
-3. **边缘函数**: `adapter-cloudflare` 会自动为 Cloudflare Pages Functions 生成必要的函数代码
-
-4. **缓存**: `_headers` 文件已配置正确的缓存策略
+部署成功后，访问：
+- `https://your-project.pages.dev` - 主页（自动重定向到 `/en`）
+- `https://your-project.pages.dev/zh` - 中文页面
+- `https://your-project.pages.dev/ja` - 日语页面
+- 其他语言路由...
 
 ## 故障排除
 
-### 部署失败
+### 构建失败
 
-如果看到 "Missing entry-point" 错误，确保：
-- 构建命令是 `npm run build`
-- 输出目录是 `.svelte-kit/output/client`
-- 使用了 `@sveltejs/adapter-cloudflare`
+- 检查 Node.js 版本（推荐 18 或更高）
+- 确认 `@sveltejs/adapter-cloudflare` 已安装
+- 查看构建日志中的错误信息
 
 ### 页面无法访问
 
-检查 Cloudflare Pages 的日志和构建设置。
+- 检查 Cloudflare Pages 的构建是否成功
+- 查看 Pages 的 **Functions** 标签页确认 Function 已部署
+- 检查路由配置
 
-### 多语言路由
+### 多语言路由问题
 
-确保 SvelteKit 的路由配置正确，语言路由应该正常工作。
+- 确认 `+layout.ts` 正确返回 `lang` 参数
+- 检查 `getLangFromPath` 函数在 `i18n.ts` 中正确实现
+
+### Worker 函数错误
+
+- 检查 `_worker.js` 是否在输出目录根目录
+- 查看 Pages 的 **Functions** 日志
+
+## 本地预览
+
+构建后在本地预览：
+
+```bash
+npm run build
+npx wrangler pages dev .svelte-kit/output/client
+```
 
 ## 相关链接
 
 - [Cloudflare Pages 文档](https://developers.cloudflare.com/pages/)
+- [Cloudflare Pages Functions 文档](https://developers.cloudflare.com/pages/functions/)
 - [SvelteKit 适配器文档](https://kit.svelte.dev/docs/adapters)
 - [Wrangler CLI 文档](https://developers.cloudflare.com/workers/wrangler/)
