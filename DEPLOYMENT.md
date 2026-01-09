@@ -26,7 +26,7 @@ git push -u origin main
 | **Production branch** | `main` |
 | **Framework preset** | `None` |
 | **Build command** | `npm run build` |
-| **Build output directory** | `.svelte-kit/output/client` |
+| **Build output directory** | `.svelte-kit/output` |
 
 6. 点击 **Save and Deploy**
 
@@ -91,7 +91,7 @@ git push -u origin main
 
 ```bash
 npm run build
-npx wrangler pages dev .svelte-kit/output/client
+npx wrangler pages dev .svelte-kit/output
 ```
 
 ## 相关链接
