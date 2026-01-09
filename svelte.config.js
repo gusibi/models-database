@@ -6,11 +6,7 @@ const config = {
 	preprocess: vitePreprocess(),
 
 	kit: {
-		adapter: adapter({
-			platformProxy: {
-				enabled: true
-			}
-		})
+		adapter: adapter()
 	}
 };
 
