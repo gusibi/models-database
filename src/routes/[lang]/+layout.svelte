@@ -1,7 +1,7 @@
 <script lang="ts">
   import { defaultLang, getLanguageMeta, getTranslations, languages } from '$lib/i18n';
 
-  const baseUrl = 'https://models.eztools.com';
+  const baseUrl = 'https://models.eztoolab.com';
 
   const props = $props();
   const { children } = props;
