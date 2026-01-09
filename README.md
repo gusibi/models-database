@@ -42,7 +42,7 @@ You can preview the production build with `npm run preview`.
 3. Or use "Connect to Git" and connect your repository
 4. Build settings:
    - Build command: `npm run build`
-   - Build output directory: `.svelte-kit/output`
+   - Build output directory: `.svelte-kit/cloudflare`
    - Node.js version: `20`
 
 ### Option 2: Using Wrangler CLI
@@ -60,14 +60,14 @@ wrangler login
 Deploy:
 ```bash
 npm run build
-wrangler pages deploy .svelte-kit/output
+wrangler pages deploy .svelte-kit/cloudflare
 ```
 
 ### Option 3: Automatic Deployment from Git
 
 Connect your repository to Cloudflare Pages through the dashboard with these settings:
 - **Build command**: `npm run build`
-- **Build output directory**: `.svelte-kit/output`
+- **Build output directory**: `.svelte-kit/cloudflare`
 - **Node.js version**: `20`
 
 ## Project Structure
