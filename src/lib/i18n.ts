@@ -36,6 +36,7 @@ export type Translations = {
   resultsFoundOne: string;
   resultsFoundMany: string;
   columnsLabel: string;
+  resetFilters: string;
   labelAll: string;
   labelNone: string;
   groupSearch: string;
@@ -149,6 +150,7 @@ const translations: Record<string, Translations> = {
     resultsFoundOne: '{count} Model Found',
     resultsFoundMany: '{count} Models Found',
     columnsLabel: 'Columns ({count})',
+    resetFilters: 'Reset Filters',
     showAll: 'Show All',
     hideAll: 'Hide All',
     sortName: 'Name',
@@ -231,6 +233,7 @@ const translations: Record<string, Translations> = {
     resultsFoundOne: '共 {count} 个模型',
     resultsFoundMany: '共 {count} 个模型',
     columnsLabel: '列 ({count})',
+    resetFilters: '重置筛选',
     showAll: '全选',
     hideAll: '全不选',
     sortName: '名称',
@@ -314,6 +317,7 @@ const translations: Record<string, Translations> = {
     resultsFoundOne: '{count} 件のモデル',
     resultsFoundMany: '{count} 件のモデル',
     columnsLabel: '列 ({count})',
+    resetFilters: 'フィルターをリセット',
     showAll: 'すべて表示',
     hideAll: 'すべて非表示',
     sortName: '名前',
@@ -396,6 +400,7 @@ const translations: Record<string, Translations> = {
     resultsFoundOne: '모델 {count}개',
     resultsFoundMany: '모델 {count}개',
     columnsLabel: '열 ({count})',
+    resetFilters: '필터 초기화',
     showAll: '모두 표시',
     hideAll: '모두 숨김',
     sortName: '이름',
@@ -479,6 +484,7 @@ const translations: Record<string, Translations> = {
     resultsFoundOne: '{count} modelo encontrado',
     resultsFoundMany: '{count} modelos encontrados',
     columnsLabel: 'Columnas ({count})',
+    resetFilters: 'Restablecer filtros',
     showAll: 'Mostrar todo',
     hideAll: 'Ocultar todo',
     sortName: 'Nombre',
@@ -562,6 +568,7 @@ const translations: Record<string, Translations> = {
     resultsFoundOne: '{count} modèle trouvé',
     resultsFoundMany: '{count} modèles trouvés',
     columnsLabel: 'Colonnes ({count})',
+    resetFilters: 'Réinitialiser les filtres',
     showAll: 'Tout afficher',
     hideAll: 'Tout masquer',
     sortName: 'Nom',
@@ -645,6 +652,7 @@ const translations: Record<string, Translations> = {
     resultsFoundOne: '{count} Modell gefunden',
     resultsFoundMany: '{count} Modelle gefunden',
     columnsLabel: 'Spalten ({count})',
+    resetFilters: 'Filter zurücksetzen',
     showAll: 'Alle anzeigen',
     hideAll: 'Alle ausblenden',
     sortName: 'Name',
@@ -728,6 +736,7 @@ const translations: Record<string, Translations> = {
     resultsFoundOne: '{count} modelo encontrado',
     resultsFoundMany: '{count} modelos encontrados',
     columnsLabel: 'Colunas ({count})',
+    resetFilters: 'Redefinir filtros',
     showAll: 'Mostrar tudo',
     hideAll: 'Ocultar tudo',
     sortName: 'Nome',
@@ -811,6 +820,7 @@ const translations: Record<string, Translations> = {
     resultsFoundOne: 'Найдено моделей: {count}',
     resultsFoundMany: 'Найдено моделей: {count}',
     columnsLabel: 'Колонки ({count})',
+    resetFilters: 'Сбросить фильтры',
     showAll: 'Показать все',
     hideAll: 'Скрыть все',
     sortName: 'Название',
@@ -893,6 +903,7 @@ const translations: Record<string, Translations> = {
     resultsFoundOne: 'عدد النماذج: {count}',
     resultsFoundMany: 'عدد النماذج: {count}',
     columnsLabel: 'الأعمدة ({count})',
+    resetFilters: 'إعادة ضبط الفلاتر',
     showAll: 'إظهار الكل',
     hideAll: 'إخفاء الكل',
     sortName: 'الاسم',
@@ -976,6 +987,7 @@ const translations: Record<string, Translations> = {
     resultsFoundOne: '{count} मॉडल मिले',
     resultsFoundMany: '{count} मॉडल मिले',
     columnsLabel: 'कॉलम ({count})',
+    resetFilters: 'फ़िल्टर रीसेट करें',
     showAll: 'सभी दिखाएँ',
     hideAll: 'सभी छिपाएँ',
     sortName: 'नाम',
@@ -1059,6 +1071,7 @@ const translations: Record<string, Translations> = {
     resultsFoundOne: '{count} model ditemukan',
     resultsFoundMany: '{count} model ditemukan',
     columnsLabel: 'Kolom ({count})',
+    resetFilters: 'Atur ulang filter',
     showAll: 'Tampilkan semua',
     hideAll: 'Sembunyikan semua',
     sortName: 'Nama',

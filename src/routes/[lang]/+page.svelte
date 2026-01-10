@@ -114,6 +114,10 @@
    let filteredModels = $state<Model[]>([]);
    let displayModels = $state<Model[]>([]);
 
+   $effect(() => {
+     displayModels = sortModels(filteredModels);
+   });
+
    function handleHorizontalScroll(e: Event) {
      const target = e.target as HTMLDivElement;
      if (isSyncingScroll) return;
@@ -248,7 +252,44 @@
 
      const nextFiltered = filterModels(models, options);
      filteredModels = nextFiltered;
-     displayModels = sortModels(nextFiltered);
+   }
+
+   function resetFilters() {
+     if (models.length === 0) return;
+     const maxCost = getMaxCost(models);
+
+     maxInputCost = maxCost.input;
+     maxOutputCost = maxCost.output;
+     maxCacheReadCost = maxCacheReadCap;
+     maxCacheWriteCost = maxCacheWriteCap;
+     maxReasoningCost = maxReasoningCap;
+     maxInputAudioCost = maxInputAudioCap;
+     maxOutputAudioCost = maxOutputAudioCap;
+     minContext = 0;
+     minOutput = 0;
+     minReleaseDate = '';
+     features = {
+       vision: null,
+       audio: null,
+       video: null,
+       code: null,
+       reasoning: null,
+       toolCall: null,
+       openWeights: null,
+       structuredOutput: null,
+       temperature: null
+     };
+     openWeightsOnly = false;
+     freeOnly = false;
+     knowledgeOnly = false;
+     interleavedOnly = false;
+     searchText = '';
+     providerSearch = '';
+     selectedProviders = allProviders.map(p => p.id);
+     providerDropdownOpen = false;
+     showFieldSelector = false;
+
+     applyFilters();
    }
    
    function toggleProvider(providerId: string) {
@@ -748,8 +789,11 @@
               </div>
             {/if}
           </div>
+          <button class="reset-btn" type="button" onclick={resetFilters}>
+            {t.resetFilters}
+          </button>
           <div class="sort-controls">
-            <select class="sort-select" bind:value={sortBy} onchange={() => {}}>
+            <select class="sort-select" bind:value={sortBy}>
               <option value="name">{t.sortName}</option>
               <option value="provider">{t.sortProvider}</option>
               <option value="family">{t.sortFamily}</option>
@@ -1543,6 +1587,22 @@
     align-items: center;
     gap: 1rem;
     flex-wrap: wrap;
+  }
+
+  .reset-btn {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .reset-btn:hover {
+    background: var(--surface-alt);
+    border-color: var(--primary);
   }
 
   .field-selector {
