@@ -29,10 +29,12 @@
    let loading = $state(true);
    let error = $state<string | null>(null);
    
-   let allProviders = $state<{ id: string; name: string }[]>([]);
-   let selectedProviders = $state<string[]>([]);
-   let providerSearch = $state('');
-   let providerDropdownOpen = $state(false);
+    let allProviders = $state<{ id: string; name: string }[]>([]);
+    let selectedProviders = $state<string[]>([]);
+    let providerSearch = $state('');
+    let providerDropdownOpen = $state(false);
+    let providerDropdownButton = $state<HTMLButtonElement | null>(null);
+    let providerDropdownStyle = $state<string>('');
    
   let maxInputCost = $state<number>(10);
   let maxOutputCost = $state<number>(10);
@@ -166,47 +168,52 @@
      document.documentElement.dataset.theme = theme;
    });
    
-   function getMaxOptionalCost(key: keyof Model['properties']['cost']): number {
-     if (models.length === 0) return 0;
-     return Math.max(...models.map(model => model.properties.cost[key] ?? 0));
-   }
+    function getMaxOptionalCost(key: keyof Model['properties']['cost']): number {
+      if (models.length === 0) return 0;
+      const values = models.map(model => {
+        const val = model.properties.cost[key];
+        return typeof val === 'number' ? val : 0;
+      });
+      return Math.max(...values, 0);
+    }
 
-   onMount(async () => {
-     try {
-       const data = await loadModels();
-       models = getAllModels(data);
-       allProviders = getUniqueProviders(data);
-       selectedProviders = allProviders.map(p => p.id);
+    onMount(async () => {
+      try {
+        const data = await loadModels();
+        models = getAllModels(data);
+        allProviders = getUniqueProviders(data);
+        console.log('Loaded providers:', allProviders.length, allProviders);
+        selectedProviders = allProviders.map(p => p.id);
 
-       const maxCost = getMaxCost(models);
-       const maxCtx = getMaxContext(models);
-       const maxOut = getMaxOutput(models);
+        const maxCost = getMaxCost(models);
+        const maxCtx = getMaxContext(models);
+        const maxOut = getMaxOutput(models);
 
-       maxInputCost = maxCost.input;
-       maxOutputCost = maxCost.output;
-       minContext = 0;
-       minOutput = 0;
+        maxInputCost = maxCost.input;
+        maxOutputCost = maxCost.output;
+        minContext = 0;
+        minOutput = 0;
 
-       maxCacheReadCap = getMaxOptionalCost('cache_read');
-       maxCacheWriteCap = getMaxOptionalCost('cache_write');
-       maxReasoningCap = getMaxOptionalCost('reasoning');
-       maxInputAudioCap = getMaxOptionalCost('input_audio');
-       maxOutputAudioCap = getMaxOptionalCost('output_audio');
+        maxCacheReadCap = getMaxOptionalCost('cache_read');
+        maxCacheWriteCap = getMaxOptionalCost('cache_write');
+        maxReasoningCap = getMaxOptionalCost('reasoning');
+        maxInputAudioCap = getMaxOptionalCost('input_audio');
+        maxOutputAudioCap = getMaxOptionalCost('output_audio');
 
-       maxCacheReadCost = maxCacheReadCap;
-       maxCacheWriteCost = maxCacheWriteCap;
-       maxReasoningCost = maxReasoningCap;
-       maxInputAudioCost = maxInputAudioCap;
-       maxOutputAudioCost = maxOutputAudioCap;
+        maxCacheReadCost = maxCacheReadCap;
+        maxCacheWriteCost = maxCacheWriteCap;
+        maxReasoningCost = maxReasoningCap;
+        maxInputAudioCost = maxInputAudioCap;
+        maxOutputAudioCost = maxOutputAudioCap;
 
-       applyFilters();
-     } catch (e) {
-       error = t.errorLoad;
-       console.error(e);
-     } finally {
-       loading = false;
-     }
-   });
+        applyFilters();
+      } catch (e) {
+        error = t.errorLoad;
+        console.error(e);
+      } finally {
+        loading = false;
+      }
+    });
    
    function applyFilters() {
      if (models.length === 0) {
@@ -324,9 +331,13 @@
      }
    }
    
-   function toggleProviderDropdown() {
-     providerDropdownOpen = !providerDropdownOpen;
-   }
+    function toggleProviderDropdown() {
+      providerDropdownOpen = !providerDropdownOpen;
+      if (providerDropdownOpen && providerDropdownButton) {
+        const rect = providerDropdownButton.getBoundingClientRect();
+        providerDropdownStyle = `top: ${rect.bottom + 8}px; left: ${rect.left}px; width: ${Math.max(280, rect.width)}px;`;
+      }
+    }
    
    function selectAllProviders() {
      selectedProviders = allProviders.map(p => p.id);
@@ -354,12 +365,14 @@
      availableFields = availableFields.map(f => ({ ...f, visible: false }));
    }
 
-    const filteredProviders = $derived(() =>
-      allProviders.filter(p =>
-        p.name.toLowerCase().includes(providerSearch.toLowerCase()) ||
-        p.id.toLowerCase().includes(providerSearch.toLowerCase())
-      )
-    );
+     const filteredProviders = $derived.by(() => {
+       const result = allProviders.filter(p =>
+         p.name.toLowerCase().includes(providerSearch.toLowerCase()) ||
+         p.id.toLowerCase().includes(providerSearch.toLowerCase())
+       );
+       console.log('Filtered providers:', result.length, result);
+       return result;
+     });
 
   </script>
 
@@ -410,40 +423,46 @@
       <div class="filter-group">
         <div class="filter-group-title">{t.groupProviders}</div>
         <div class="filter-group-body">
-          <div class="filter-item filter-providers">
-            <div class="provider-dropdown">
-              <button class="dropdown-toggle compact" onclick={toggleProviderDropdown}>
-                <span>{getProvidersCountLabel(selectedProviders.length, allProviders.length)}</span>
-                <span class="dropdown-arrow">▼</span>
-              </button>
-              {#if providerDropdownOpen}
-                <div class="dropdown-content">
-                  <div class="dropdown-actions">
-                    <button class="action-btn" onclick={selectAllProviders}>{t.labelAll}</button>
-                    <button class="action-btn" onclick={clearAllProviders}>{t.labelNone}</button>
-                  </div>
-                  <input
-                    type="text"
-                    placeholder={t.providerSearchPlaceholder}
-                    bind:value={providerSearch}
-                    class="provider-search compact"
-                  />
-                  <div class="dropdown-list">
-                    {#each filteredProviders as provider}
-                      <label class="dropdown-item">
-                        <input
-                          type="checkbox"
-                          checked={selectedProviders.includes(provider.id)}
-                          onchange={() => toggleProvider(provider.id)}
-                        />
-                        <span class="provider-name">{provider.name}</span>
-                      </label>
-                    {/each}
-                  </div>
-                </div>
-              {/if}
-            </div>
-          </div>
+           <div class="filter-item filter-providers">
+             <div class="provider-dropdown">
+               <button bind:this={providerDropdownButton} class="dropdown-toggle compact" onclick={toggleProviderDropdown}>
+                 <span>{getProvidersCountLabel(selectedProviders.length, allProviders.length)}</span>
+                 <span class="dropdown-arrow">▼</span>
+               </button>
+               {#if providerDropdownOpen}
+                 <div class="dropdown-content" style={providerDropdownStyle}>
+                   <div class="dropdown-actions">
+                     <button class="action-btn" onclick={selectAllProviders}>{t.labelAll}</button>
+                     <button class="action-btn" onclick={clearAllProviders}>{t.labelNone}</button>
+                   </div>
+                   <input
+                     type="text"
+                     placeholder={t.providerSearchPlaceholder}
+                     bind:value={providerSearch}
+                     class="provider-search compact"
+                   />
+                   <div class="dropdown-list">
+                     {#if allProviders.length === 0}
+                       <div class="dropdown-empty">Loading providers...</div>
+                     {:else if filteredProviders.length === 0}
+                       <div class="dropdown-empty">No providers found</div>
+                     {:else}
+                       {#each filteredProviders as provider}
+                         <label class="dropdown-item">
+                           <input
+                             type="checkbox"
+                             checked={selectedProviders.includes(provider.id)}
+                             onchange={() => toggleProvider(provider.id)}
+                           />
+                           <span class="provider-name">{provider.name}</span>
+                         </label>
+                       {/each}
+                     {/if}
+                   </div>
+                 </div>
+               {/if}
+             </div>
+           </div>
         </div>
       </div>
 
@@ -451,29 +470,34 @@
         <div class="filter-group-title">{t.groupPricing}</div>
         <div class="filter-group-body">
           <div class="filter-item filter-cost">
-            <div class="compact-range">
+            <div class="compact-range stacked">
               <span class="range-label">{t.labelInputOutput}:</span>
-              <input
-                type="range"
-                min="0"
-                max={getMaxCost(models).input}
-                step="0.01"
-                bind:value={maxInputCost}
-                title={t.sortInputCost}
-                oninput={applyFilters}
-              />
-              <span class="range-value">${maxInputCost.toFixed(2)}</span>
-              <span class="range-divider">/</span>
-              <input
-                type="range"
-                min="0"
-                max={getMaxCost(models).output}
-                step="0.01"
-                bind:value={maxOutputCost}
-                title={t.sortOutputCost}
-                oninput={applyFilters}
-              />
-              <span class="range-value">${maxOutputCost.toFixed(2)}</span>
+              <div class="range-row">
+                <span class="range-sub-label">{t.sortInputCost}</span>
+                <input
+                  type="range"
+                  min="0"
+                  max={getMaxCost(models).input}
+                  step="0.01"
+                  bind:value={maxInputCost}
+                  title={t.sortInputCost}
+                  oninput={applyFilters}
+                />
+                <span class="range-value">${maxInputCost.toFixed(2)}</span>
+              </div>
+              <div class="range-row">
+                <span class="range-sub-label">{t.sortOutputCost}</span>
+                <input
+                  type="range"
+                  min="0"
+                  max={getMaxCost(models).output}
+                  step="0.01"
+                  bind:value={maxOutputCost}
+                  title={t.sortOutputCost}
+                  oninput={applyFilters}
+                />
+                <span class="range-value">${maxOutputCost.toFixed(2)}</span>
+              </div>
               <label class="free-checkbox">
                 <input type="checkbox" bind:checked={freeOnly} onchange={applyFilters} />
                 <span>{t.freeLabel}</span>
@@ -555,27 +579,32 @@
         <div class="filter-group-title">{t.groupLimits}</div>
         <div class="filter-group-body">
           <div class="filter-item filter-context">
-            <div class="compact-range">
+            <div class="compact-range stacked">
               <span class="range-label">{t.labelContextOutput}:</span>
-              <input
-                type="range"
-                min="0"
-                max={getMaxContext(models)}
-                step="1000"
-                bind:value={minContext}
-                oninput={applyFilters}
-              />
-              <span class="range-value">{formatNumber(minContext)}</span>
-              <span class="range-divider">/</span>
-              <input
-                type="range"
-                min="0"
-                max={getMaxOutput(models)}
-                step="1000"
-                bind:value={minOutput}
-                oninput={applyFilters}
-              />
-              <span class="range-value">{formatNumber(minOutput)}</span>
+              <div class="range-row">
+                <span class="range-sub-label">{t.tableContext}</span>
+                <input
+                  type="range"
+                  min="0"
+                  max={getMaxContext(models)}
+                  step="1000"
+                  bind:value={minContext}
+                  oninput={applyFilters}
+                />
+                <span class="range-value">{formatNumber(minContext)}</span>
+              </div>
+              <div class="range-row">
+                <span class="range-sub-label">{t.tableOutput}</span>
+                <input
+                  type="range"
+                  min="0"
+                  max={getMaxOutput(models)}
+                  step="1000"
+                  bind:value={minOutput}
+                  oninput={applyFilters}
+                />
+                <span class="range-value">{formatNumber(minOutput)}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -720,7 +749,7 @@
             {/if}
           </div>
           <div class="sort-controls">
-            <select class="sort-select" bind:value={sortBy} onchange={sortModels}>
+            <select class="sort-select" bind:value={sortBy} onchange={() => {}}>
               <option value="name">{t.sortName}</option>
               <option value="provider">{t.sortProvider}</option>
               <option value="family">{t.sortFamily}</option>
@@ -731,7 +760,6 @@
             </select>
             <button class="sort-order-btn" onclick={() => {
               sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-              sortModels();
             }}>
               {sortOrder === 'asc' ? `↓ ${t.sortAsc}` : `↑ ${t.sortDesc}`}
             </button>
@@ -1214,6 +1242,27 @@
     font-size: 0.8rem;
   }
 
+  .compact-range.stacked {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .range-row {
+    display: grid;
+    grid-template-columns: minmax(110px, auto) 1fr auto;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .range-sub-label {
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
   .compact-range input[type="range"] {
     width: 110px;
     height: 4px;
@@ -1341,15 +1390,16 @@
   }
   
   .dropdown-content {
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    right: 0;
+    position: fixed;
+    top: auto;
+    left: auto;
+    min-width: 280px;
+    max-width: 400px;
     background: var(--surface);
     border: 1px solid var(--border-strong);
     border-radius: 8px;
     box-shadow: 0 4px 20px var(--shadow);
-    z-index: 100;
+    z-index: 1000;
     max-height: 400px;
     display: flex;
     flex-direction: column;
@@ -1408,6 +1458,13 @@
     max-height: 300px;
     overflow-y: auto;
     padding: 0.5rem 0;
+  }
+
+  .dropdown-empty {
+    padding: 1rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.9rem;
   }
   
   .dropdown-item {

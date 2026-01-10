@@ -1,3 +1,4 @@
+import { base } from '$app/paths';
 import type { Model, ModelData, RawProvider, RawModel, FilterOptions } from './types';
 
 export type { Model, ModelData, FilterOptions };
@@ -7,16 +8,12 @@ let modelsData: ModelData | null = null;
 export async function loadModels(): Promise<ModelData> {
   if (modelsData) return modelsData;
   
-  try {
-    const response = await fetch('/models.json');
-    if (!response.ok) throw new Error('Failed to load models');
-    const data: ModelData = await response.json();
-    modelsData = data;
-    return modelsData;
-  } catch (error) {
-    console.error('Error loading models:', error);
-    return {};
-  }
+  const url = `${base}/models.json`;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Failed to load models: ${response.status}`);
+  const data: ModelData = await response.json();
+  modelsData = data;
+  return modelsData;
 }
 
 export function getAllModels(data: ModelData): Model[] {
@@ -71,7 +68,11 @@ export function getModelsByProvider(data: ModelData, providerId: string): Model[
 }
 
 export function getUniqueProviders(data: ModelData): { id: string; name: string }[] {
-  return Object.values(data).map(p => ({ id: p.id, name: p.name }));
+  if (!data) return [];
+  return Object.entries(data).map(([key, p]) => ({
+    id: p?.id ?? key,
+    name: p?.name ?? key
+  }));
 }
 
 export function filterModels(models: Model[], options: FilterOptions): Model[] {
