@@ -37,6 +37,9 @@ git push -u origin main
 - Preview
 - Deployment
 
+推荐添加：
+- `PUBLIC_MODELS_URL`：指向 R2 上的 `models.json` 公网地址
+
 ## 构建说明
 
 项目使用 `@sveltejs/adapter-cloudflare` 适配器，它会：
@@ -50,8 +53,21 @@ git push -u origin main
 - ✅ 复制 `_headers`（HTTP 头配置）
 - ✅ 复制 `_routes.json`（路由配置）
 - ✅ 复制 `sitemap.xml`（站点地图）
-- ✅ 复制 `models.json`（模型数据）
+- ✅ 复制 `models.json`（模型数据，作为本地兜底）
 - ✅ 复制 `robots.txt`（爬虫配置）
+
+## R2 每日同步（定时任务）
+
+使用 Cloudflare Workers 的 Cron Triggers 拉取 `https://models.dev/api.json` 并写入 R2。
+
+1. 创建 R2 bucket，并设置公网访问或自定义域名。
+2. 编辑 `wrangler.update.jsonc`：
+   - 设置 `bucket_name` 为你的 bucket 名称
+   - 如需调整频率，修改 `crons`
+3. 部署定时 Worker：
+   - `npx wrangler deploy -c wrangler.update.jsonc`
+4. 在 Pages 设置 `PUBLIC_MODELS_URL`：
+   - `https://<r2-domain>/models.json`
 
 ## 验证部署
 

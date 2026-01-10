@@ -8,7 +8,7 @@ let modelsData: ModelData | null = null;
 export async function loadModels(): Promise<ModelData> {
   if (modelsData) return modelsData;
   
-  const url = `${base}/models.json`;
+  const url = import.meta.env.PUBLIC_MODELS_URL ?? `${base}/models.json`;
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Failed to load models: ${response.status}`);
   const data: ModelData = await response.json();

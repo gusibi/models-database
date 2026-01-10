@@ -90,12 +90,26 @@ Connect your repository to Cloudflare Pages through the dashboard with these set
 
 ## Data Source
 
-Model data is loaded from `static/models.json`, which contains comprehensive information about various AI models including:
+Model data is loaded from `PUBLIC_MODELS_URL` (for example, an R2 public URL). If the env var is not set, it falls back to `static/models.json`.
+
+The dataset contains comprehensive information about various AI models including:
 - Pricing (input/output costs, cache costs)
 - Capabilities (context window, max output)
 - Features (vision, audio, video, code, reasoning, tool calling)
 - Release information
 - Provider details
+
+### Daily sync to R2 (cron)
+
+A scheduled Worker can pull from `https://models.dev/api.json` and update the R2 object daily.
+
+1. Create an R2 bucket and set its public URL (or a custom domain).
+2. Configure the Worker in `wrangler.update.jsonc`:
+   - Set `bucket_name` to your bucket name.
+   - Adjust the cron schedule if needed.
+3. Deploy the Worker:
+   - `npx wrangler deploy -c wrangler.update.jsonc`
+4. Set `PUBLIC_MODELS_URL` in Cloudflare Pages to your R2 URL, e.g. `https://<r2-domain>/models.json`.
 
 ## License
 
