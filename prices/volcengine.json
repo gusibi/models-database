@@ -1,0 +1,233 @@
+{
+  "provider": "volcengine",
+  "url": "https://www.volcengine.com/docs/82379/1544106",
+  "currency": "CNY",
+  "retrieved_at": "2026-01-22T15:15:00Z",
+  "models": [
+    {
+      "model": "doubao-seed-1.8",
+      "pricing_type": "token",
+      "input_price": 0.80,
+      "output_price": 2.00,
+      "cache_price": 0.16
+    },
+    {
+      "model": "doubao-seed-code",
+      "pricing_type": "token",
+      "input_price": 1.20,
+      "output_price": 8.00,
+      "cache_price": 0.24
+    },
+    {
+      "model": "doubao-seed-1.6",
+      "pricing_type": "token",
+      "input_price": 0.80,
+      "output_price": 8.00,
+      "cache_price": 0.16
+    },
+    {
+      "model": "doubao-seed-1.6-lite",
+      "pricing_type": "token",
+      "input_price": 0.30,
+      "output_price": 0.60,
+      "cache_price": 0.06
+    },
+    {
+      "model": "doubao-seed-1.6-flash",
+      "pricing_type": "token",
+      "input_price": 0.15,
+      "output_price": 1.50,
+      "cache_price": 0.03
+    },
+    {
+      "model": "doubao-seed-1.6-vision",
+      "pricing_type": "token",
+      "input_price": 0.80,
+      "output_price": 8.00,
+      "cache_price": 0.16
+    },
+    {
+      "model": "doubao-seed-1.6-thinking",
+      "pricing_type": "token",
+      "input_price": 0.80,
+      "output_price": 8.00,
+      "cache_price": 0.16
+    },
+    {
+      "model": "doubao-seed-translation",
+      "pricing_type": "token",
+      "input_price": 1.20,
+      "output_price": 3.60
+    },
+    {
+      "model": "doubao-1.5-thinking-pro",
+      "pricing_type": "token",
+      "input_price": 4.00,
+      "output_price": 16.00
+    },
+    {
+      "model": "doubao-1.5-thinking-vision-pro",
+      "pricing_type": "token",
+      "input_price": 3.00,
+      "output_price": 9.00
+    },
+    {
+      "model": "doubao-1.5-pro-32k",
+      "pricing_type": "token",
+      "input_price": 0.80,
+      "output_price": 2.00,
+      "cache_price": 0.16
+    },
+    {
+      "model": "doubao-1.5-lite-32k",
+      "pricing_type": "token",
+      "input_price": 0.30,
+      "output_price": 0.60,
+      "cache_price": 0.06
+    },
+    {
+      "model": "doubao-1.5-vision-pro",
+      "pricing_type": "token",
+      "input_price": 3.00,
+      "output_price": 9.00
+    },
+    {
+      "model": "doubao-1.5-vision-lite",
+      "pricing_type": "token",
+      "input_price": 1.50,
+      "output_price": 4.50
+    },
+    {
+      "model": "doubao-1.5-ui-tars",
+      "pricing_type": "token",
+      "input_price": 3.50,
+      "output_price": 12.00
+    },
+    {
+      "model": "doubao-lite-32k",
+      "pricing_type": "token",
+      "input_price": 0.30,
+      "output_price": 0.60,
+      "cache_price": 0.06
+    },
+    {
+      "model": "GLM-4.7",
+      "pricing_type": "token",
+      "input_price": 2.00,
+      "output_price": 8.00,
+      "cache_price": 0.40
+    },
+    {
+      "model": "deepseek-v3.2",
+      "pricing_type": "token",
+      "input_price": 2.00,
+      "output_price": 3.00,
+      "cache_price": 0.40
+    },
+    {
+      "model": "deepseek-v3.1",
+      "pricing_type": "token",
+      "input_price": 4.00,
+      "output_price": 12.00,
+      "cache_price": 0.80
+    },
+    {
+      "model": "deepseek-v3",
+      "pricing_type": "token",
+      "input_price": 2.00,
+      "output_price": 8.00,
+      "cache_price": 0.40
+    },
+    {
+      "model": "deepseek-r1",
+      "pricing_type": "token",
+      "input_price": 4.00,
+      "output_price": 16.00,
+      "cache_price": 0.80
+    },
+    {
+      "model": "kimi-k2",
+      "pricing_type": "token",
+      "input_price": 4.00,
+      "output_price": 16.00,
+      "cache_price": 0.80
+    },
+    {
+      "model": "doubao-seedance-1.5-pro",
+      "pricing_type": "per_second",
+      "price": 16.00,
+      "price_unit": "second"
+    },
+    {
+      "model": "doubao-seedance-1.0-pro",
+      "pricing_type": "per_second",
+      "price": 15.00,
+      "price_unit": "second"
+    },
+    {
+      "model": "doubao-seedance-1.0-pro-fast",
+      "pricing_type": "per_second",
+      "price": 4.20,
+      "price_unit": "second"
+    },
+    {
+      "model": "doubao-seedance-1-0-lite",
+      "pricing_type": "per_second",
+      "price": 10.00,
+      "price_unit": "second"
+    },
+    {
+      "model": "doubao-seedream-4.5",
+      "pricing_type": "per_image",
+      "price": 0.25,
+      "price_unit": "image"
+    },
+    {
+      "model": "doubao-seedream-4.0",
+      "pricing_type": "per_image",
+      "price": 0.20,
+      "price_unit": "image"
+    },
+    {
+      "model": "doubao-seedream-3.0-t2i",
+      "pricing_type": "per_image",
+      "price": 0.259,
+      "price_unit": "image"
+    },
+    {
+      "model": "doubao-seededit-3.0-i2i",
+      "pricing_type": "per_image",
+      "price": 0.30,
+      "price_unit": "image"
+    },
+    {
+      "model": "doubao-seed3d-1.0",
+      "pricing_type": "per_request",
+      "price": 2.40,
+      "price_unit": "request"
+    },
+    {
+      "model": "doubao-embedding",
+      "pricing_type": "token",
+      "input_price": 0.50
+    },
+    {
+      "model": "doubao-embedding-large",
+      "pricing_type": "token",
+      "input_price": 0.70
+    },
+    {
+      "model": "doubao-embedding-vision",
+      "pricing_type": "token",
+      "input_price": 0.70,
+      "output_price": 1.80
+    },
+    {
+      "model": "doubao-pro-32k",
+      "pricing_type": "token",
+      "input_price": 0.80,
+      "output_price": 2.00,
+      "cache_price": 0.16
+    }
+  ]
+}

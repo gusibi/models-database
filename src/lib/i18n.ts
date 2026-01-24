@@ -30,6 +30,7 @@ export type Translations = {
   headerTitle: string;
   headerSubtitle: string;
   srDescription: string;
+  searchLabel: string;
   searchPlaceholder: string;
   providerSearchPlaceholder: string;
   providersCount: string;
@@ -37,6 +38,11 @@ export type Translations = {
   resultsFoundMany: string;
   columnsLabel: string;
   resetFilters: string;
+  quickFilters: string;
+  activeFilters: string;
+  moreFilters: string;
+  close: string;
+  custom: string;
   labelAll: string;
   labelNone: string;
   groupSearch: string;
@@ -76,6 +82,7 @@ export type Translations = {
   sortReleaseDate: string;
   sortAsc: string;
   sortDesc: string;
+  sortLabel: string;
   tableName: string;
   tableProvider: string;
   tableFamily: string;
@@ -116,6 +123,7 @@ const translations: Record<string, Translations> = {
     headerSubtitle: 'Search, filter, and compare AI models with rich criteria',
     srDescription:
       'Compare AI models across providers with rich filters for pricing, context length, output limits, release dates, reasoning costs, features like vision, audio, video, tool use, structured output, temperature support, open weights, and free models.',
+    searchLabel: 'Search models',
     searchPlaceholder: 'Search models...',
     providerSearchPlaceholder: 'Search...',
     providersCount: 'Providers: {selected}/{total}',
@@ -151,6 +159,11 @@ const translations: Record<string, Translations> = {
     resultsFoundMany: '{count} Models Found',
     columnsLabel: 'Columns ({count})',
     resetFilters: 'Reset Filters',
+    quickFilters: 'Quick filters',
+    activeFilters: 'Active filters',
+    moreFilters: 'More filters',
+    close: 'Close',
+    custom: 'Custom',
     showAll: 'Show All',
     hideAll: 'Hide All',
     sortName: 'Name',
@@ -162,6 +175,7 @@ const translations: Record<string, Translations> = {
     sortReleaseDate: 'Release Date',
     sortAsc: 'Asc',
     sortDesc: 'Desc',
+    sortLabel: 'Sort by',
     tableName: 'Model',
     tableProvider: 'Provider',
     tableFamily: 'Family',
@@ -199,6 +213,7 @@ const translations: Record<string, Translations> = {
     headerSubtitle: '按多维度条件搜索、筛选与对比 AI 模型',
     srDescription:
       '跨提供商对比 AI 模型，支持价格、上下文、输出上限、发布日期、推理成本、视觉/音频/视频、工具调用、结构化输出、温度支持、开源权重与免费模型等筛选。',
+    searchLabel: '搜索模型',
     searchPlaceholder: '搜索模型...',
     providerSearchPlaceholder: '搜索...',
     providersCount: '提供商: {selected}/{total}',
@@ -234,6 +249,11 @@ const translations: Record<string, Translations> = {
     resultsFoundMany: '共 {count} 个模型',
     columnsLabel: '列 ({count})',
     resetFilters: '重置筛选',
+    quickFilters: '快捷筛选',
+    activeFilters: '已选筛选',
+    moreFilters: '更多筛选',
+    close: '关闭',
+    custom: '自定义',
     showAll: '全选',
     hideAll: '全不选',
     sortName: '名称',
@@ -245,6 +265,7 @@ const translations: Record<string, Translations> = {
     sortReleaseDate: '发布日期',
     sortAsc: '升序',
     sortDesc: '降序',
+    sortLabel: '排序方式',
     tableName: '模型',
     tableProvider: '提供商',
     tableFamily: '系列',
@@ -283,6 +304,7 @@ const translations: Record<string, Translations> = {
     headerSubtitle: '豊富な条件でAIモデルを検索・絞り込み・比較',
     srDescription:
       '価格、コンテキスト長、出力上限、公開日、推論コスト、視覚/音声/動画、ツール呼び出し、構造化出力、温度設定、オープンウェイト、無料モデルなどで比較可能。',
+    searchLabel: 'モデルを検索',
     searchPlaceholder: 'モデルを検索...',
     providerSearchPlaceholder: '検索...',
     providersCount: 'プロバイダー: {selected}/{total}',
@@ -318,6 +340,11 @@ const translations: Record<string, Translations> = {
     resultsFoundMany: '{count} 件のモデル',
     columnsLabel: '列 ({count})',
     resetFilters: 'フィルターをリセット',
+    quickFilters: 'クイックフィルター',
+    activeFilters: '有効なフィルター',
+    moreFilters: '詳細フィルター',
+    close: '閉じる',
+    custom: 'カスタム',
     showAll: 'すべて表示',
     hideAll: 'すべて非表示',
     sortName: '名前',
@@ -329,6 +356,7 @@ const translations: Record<string, Translations> = {
     sortReleaseDate: '公開日',
     sortAsc: '昇順',
     sortDesc: '降順',
+    sortLabel: '並び替え',
     tableName: 'モデル',
     tableProvider: 'プロバイダー',
     tableFamily: 'ファミリー',
@@ -366,6 +394,7 @@ const translations: Record<string, Translations> = {
     headerSubtitle: '풍부한 조건으로 AI 모델을 검색, 필터, 비교',
     srDescription:
       '가격, 컨텍스트 길이, 출력 한도, 출시일, 추론 비용, 비전/오디오/비디오, 도구 호출, 구조화 출력, 온도 지원, 오픈 웨이트, 무료 모델로 비교합니다.',
+    searchLabel: '모델 검색',
     searchPlaceholder: '모델 검색...',
     providerSearchPlaceholder: '검색...',
     providersCount: '제공자: {selected}/{total}',
@@ -401,6 +430,11 @@ const translations: Record<string, Translations> = {
     resultsFoundMany: '모델 {count}개',
     columnsLabel: '열 ({count})',
     resetFilters: '필터 초기화',
+    quickFilters: '빠른 필터',
+    activeFilters: '활성 필터',
+    moreFilters: '추가 필터',
+    close: '닫기',
+    custom: '사용자 지정',
     showAll: '모두 표시',
     hideAll: '모두 숨김',
     sortName: '이름',
@@ -412,6 +446,7 @@ const translations: Record<string, Translations> = {
     sortReleaseDate: '출시일',
     sortAsc: '오름차순',
     sortDesc: '내림차순',
+    sortLabel: '정렬 기준',
     tableName: '모델',
     tableProvider: '제공자',
     tableFamily: '패밀리',
@@ -450,6 +485,7 @@ const translations: Record<string, Translations> = {
     headerSubtitle: 'Busca, filtra y compara modelos de IA con criterios detallados',
     srDescription:
       'Compara modelos con filtros de precio, longitud de contexto, límites de salida, fechas de lanzamiento, costos de razonamiento, visión/audio/video, tool use, salida estructurada, temperatura, open weights y modelos gratis.',
+    searchLabel: 'Buscar modelos',
     searchPlaceholder: 'Buscar modelos...',
     providerSearchPlaceholder: 'Buscar...',
     providersCount: 'Proveedores: {selected}/{total}',
@@ -485,6 +521,11 @@ const translations: Record<string, Translations> = {
     resultsFoundMany: '{count} modelos encontrados',
     columnsLabel: 'Columnas ({count})',
     resetFilters: 'Restablecer filtros',
+    quickFilters: 'Filtros rápidos',
+    activeFilters: 'Filtros activos',
+    moreFilters: 'Más filtros',
+    close: 'Cerrar',
+    custom: 'Personalizado',
     showAll: 'Mostrar todo',
     hideAll: 'Ocultar todo',
     sortName: 'Nombre',
@@ -496,6 +537,7 @@ const translations: Record<string, Translations> = {
     sortReleaseDate: 'Fecha de lanzamiento',
     sortAsc: 'Asc',
     sortDesc: 'Desc',
+    sortLabel: 'Ordenar por',
     tableName: 'Modelo',
     tableProvider: 'Proveedor',
     tableFamily: 'Familia',
@@ -534,6 +576,7 @@ const translations: Record<string, Translations> = {
     headerSubtitle: 'Recherchez, filtrez et comparez des modèles IA',
     srDescription:
       'Comparez par prix, longueur de contexte, limites de sortie, dates, coûts de raisonnement, vision/audio/vidéo, appels d’outils, sortie structurée, température, open weights et modèles gratuits.',
+    searchLabel: 'Rechercher des modèles',
     searchPlaceholder: 'Rechercher des modèles...',
     providerSearchPlaceholder: 'Rechercher...',
     providersCount: 'Fournisseurs : {selected}/{total}',
@@ -569,6 +612,11 @@ const translations: Record<string, Translations> = {
     resultsFoundMany: '{count} modèles trouvés',
     columnsLabel: 'Colonnes ({count})',
     resetFilters: 'Réinitialiser les filtres',
+    quickFilters: 'Filtres rapides',
+    activeFilters: 'Filtres actifs',
+    moreFilters: 'Plus de filtres',
+    close: 'Fermer',
+    custom: 'Personnalisé',
     showAll: 'Tout afficher',
     hideAll: 'Tout masquer',
     sortName: 'Nom',
@@ -580,6 +628,7 @@ const translations: Record<string, Translations> = {
     sortReleaseDate: 'Date de sortie',
     sortAsc: 'Asc',
     sortDesc: 'Desc',
+    sortLabel: 'Trier par',
     tableName: 'Modèle',
     tableProvider: 'Fournisseur',
     tableFamily: 'Famille',
@@ -618,6 +667,7 @@ const translations: Record<string, Translations> = {
     headerSubtitle: 'KI-Modelle mit vielen Kriterien suchen, filtern und vergleichen',
     srDescription:
       'Vergleichen nach Preis, Kontextlänge, Ausgabelimits, Release-Datum, Reasoning-Kosten, Vision/Audio/Video, Tool-Calls, strukturiertem Output, Temperatur, Open Weights und kostenlosen Modellen.',
+    searchLabel: 'Modelle suchen',
     searchPlaceholder: 'Modelle suchen...',
     providerSearchPlaceholder: 'Suchen...',
     providersCount: 'Anbieter: {selected}/{total}',
@@ -653,6 +703,11 @@ const translations: Record<string, Translations> = {
     resultsFoundMany: '{count} Modelle gefunden',
     columnsLabel: 'Spalten ({count})',
     resetFilters: 'Filter zurücksetzen',
+    quickFilters: 'Schnellfilter',
+    activeFilters: 'Aktive Filter',
+    moreFilters: 'Weitere Filter',
+    close: 'Schließen',
+    custom: 'Benutzerdefiniert',
     showAll: 'Alle anzeigen',
     hideAll: 'Alle ausblenden',
     sortName: 'Name',
@@ -664,6 +719,7 @@ const translations: Record<string, Translations> = {
     sortReleaseDate: 'Release-Datum',
     sortAsc: 'Auf',
     sortDesc: 'Ab',
+    sortLabel: 'Sortieren nach',
     tableName: 'Modell',
     tableProvider: 'Anbieter',
     tableFamily: 'Familie',
@@ -702,6 +758,7 @@ const translations: Record<string, Translations> = {
     headerSubtitle: 'Busque, filtre e compare modelos de IA com critérios ricos',
     srDescription:
       'Compare por preço, comprimento de contexto, limites de saída, datas, custo de raciocínio, visão/áudio/vídeo, tool use, saída estruturada, temperatura, open weights e modelos gratuitos.',
+    searchLabel: 'Buscar modelos',
     searchPlaceholder: 'Buscar modelos...',
     providerSearchPlaceholder: 'Buscar...',
     providersCount: 'Provedores: {selected}/{total}',
@@ -737,6 +794,11 @@ const translations: Record<string, Translations> = {
     resultsFoundMany: '{count} modelos encontrados',
     columnsLabel: 'Colunas ({count})',
     resetFilters: 'Redefinir filtros',
+    quickFilters: 'Filtros rápidos',
+    activeFilters: 'Filtros ativos',
+    moreFilters: 'Mais filtros',
+    close: 'Fechar',
+    custom: 'Personalizado',
     showAll: 'Mostrar tudo',
     hideAll: 'Ocultar tudo',
     sortName: 'Nome',
@@ -748,6 +810,7 @@ const translations: Record<string, Translations> = {
     sortReleaseDate: 'Data de lançamento',
     sortAsc: 'Asc',
     sortDesc: 'Desc',
+    sortLabel: 'Ordenar por',
     tableName: 'Modelo',
     tableProvider: 'Provedor',
     tableFamily: 'Família',
@@ -786,6 +849,7 @@ const translations: Record<string, Translations> = {
     headerSubtitle: 'Поиск, фильтрация и сравнение AI‑моделей',
     srDescription:
       'Сравнивайте по цене, длине контекста, лимитам вывода, датам релиза, стоимости рассуждения, vision/audio/video, tool use, structured output, температуре, open weights и бесплатным моделям.',
+    searchLabel: 'Поиск моделей',
     searchPlaceholder: 'Поиск моделей...',
     providerSearchPlaceholder: 'Поиск...',
     providersCount: 'Провайдеры: {selected}/{total}',
@@ -821,6 +885,11 @@ const translations: Record<string, Translations> = {
     resultsFoundMany: 'Найдено моделей: {count}',
     columnsLabel: 'Колонки ({count})',
     resetFilters: 'Сбросить фильтры',
+    quickFilters: 'Быстрые фильтры',
+    activeFilters: 'Активные фильтры',
+    moreFilters: 'Больше фильтров',
+    close: 'Закрыть',
+    custom: 'Пользовательский',
     showAll: 'Показать все',
     hideAll: 'Скрыть все',
     sortName: 'Название',
@@ -832,6 +901,7 @@ const translations: Record<string, Translations> = {
     sortReleaseDate: 'Дата релиза',
     sortAsc: 'Возр',
     sortDesc: 'Убыв',
+    sortLabel: 'Сортировать по',
     tableName: 'Модель',
     tableProvider: 'Провайдер',
     tableFamily: 'Семейство',
@@ -869,6 +939,7 @@ const translations: Record<string, Translations> = {
     headerSubtitle: 'ابحث وصَفِّ وقارن نماذج الذكاء الاصطناعي بمعايير غنية',
     srDescription:
       'قارن حسب السعر وطول السياق وحدود المخرجات وتواريخ الإطلاق وتكلفة الاستدلال والرؤية/الصوت/الفيديو واستدعاء الأدوات والإخراج المنظم ودعم الحرارة و open weights والنماذج المجانية.',
+    searchLabel: 'ابحث عن النماذج',
     searchPlaceholder: 'ابحث عن النماذج...',
     providerSearchPlaceholder: 'بحث...',
     providersCount: 'المزوّدون: {selected}/{total}',
@@ -904,6 +975,11 @@ const translations: Record<string, Translations> = {
     resultsFoundMany: 'عدد النماذج: {count}',
     columnsLabel: 'الأعمدة ({count})',
     resetFilters: 'إعادة ضبط الفلاتر',
+    quickFilters: 'مرشحات سريعة',
+    activeFilters: 'المرشحات النشطة',
+    moreFilters: 'مرشحات إضافية',
+    close: 'إغلاق',
+    custom: 'مخصص',
     showAll: 'إظهار الكل',
     hideAll: 'إخفاء الكل',
     sortName: 'الاسم',
@@ -915,6 +991,7 @@ const translations: Record<string, Translations> = {
     sortReleaseDate: 'تاريخ الإصدار',
     sortAsc: 'تصاعدي',
     sortDesc: 'تنازلي',
+    sortLabel: 'الفرز حسب',
     tableName: 'النموذج',
     tableProvider: 'المزوّد',
     tableFamily: 'العائلة',
@@ -953,6 +1030,7 @@ const translations: Record<string, Translations> = {
     headerSubtitle: 'समृद्ध मानदंडों के साथ AI मॉडल खोजें, फ़िल्टर करें और तुलना करें',
     srDescription:
       'कीमत, कॉन्टेक्स्ट लंबाई, आउटपुट सीमा, रिलीज़ तारीख, रीजनिंग लागत, विज़न/ऑडियो/वीडियो, टूल कॉल, स्ट्रक्चर्ड आउटपुट, तापमान सपोर्ट, open weights और फ्री मॉडल के आधार पर तुलना करें।',
+    searchLabel: 'मॉडल खोजें',
     searchPlaceholder: 'मॉडल खोजें...',
     providerSearchPlaceholder: 'खोजें...',
     providersCount: 'प्रोवाइडर: {selected}/{total}',
@@ -988,6 +1066,11 @@ const translations: Record<string, Translations> = {
     resultsFoundMany: '{count} मॉडल मिले',
     columnsLabel: 'कॉलम ({count})',
     resetFilters: 'फ़िल्टर रीसेट करें',
+    quickFilters: 'त्वरित फ़िल्टर',
+    activeFilters: 'सक्रिय फ़िल्टर',
+    moreFilters: 'अधिक फ़िल्टर',
+    close: 'बंद करें',
+    custom: 'कस्टम',
     showAll: 'सभी दिखाएँ',
     hideAll: 'सभी छिपाएँ',
     sortName: 'नाम',
@@ -999,6 +1082,7 @@ const translations: Record<string, Translations> = {
     sortReleaseDate: 'रिलीज़ तिथि',
     sortAsc: 'आरोही',
     sortDesc: 'अवरोही',
+    sortLabel: 'क्रमबद्ध करें',
     tableName: 'मॉडल',
     tableProvider: 'प्रोवाइडर',
     tableFamily: 'फैमिली',
@@ -1037,6 +1121,7 @@ const translations: Record<string, Translations> = {
     headerSubtitle: 'Cari, filter, dan bandingkan model AI dengan kriteria lengkap',
     srDescription:
       'Bandingkan berdasarkan harga, panjang konteks, batas output, tanggal rilis, biaya penalaran, vision/audio/video, tool use, output terstruktur, temperatur, open weights, dan model gratis.',
+    searchLabel: 'Cari model',
     searchPlaceholder: 'Cari model...',
     providerSearchPlaceholder: 'Cari...',
     providersCount: 'Penyedia: {selected}/{total}',
@@ -1072,6 +1157,11 @@ const translations: Record<string, Translations> = {
     resultsFoundMany: '{count} model ditemukan',
     columnsLabel: 'Kolom ({count})',
     resetFilters: 'Atur ulang filter',
+    quickFilters: 'Filter cepat',
+    activeFilters: 'Filter aktif',
+    moreFilters: 'Filter lainnya',
+    close: 'Tutup',
+    custom: 'Kustom',
     showAll: 'Tampilkan semua',
     hideAll: 'Sembunyikan semua',
     sortName: 'Nama',
@@ -1083,6 +1173,7 @@ const translations: Record<string, Translations> = {
     sortReleaseDate: 'Tanggal rilis',
     sortAsc: 'Naik',
     sortDesc: 'Turun',
+    sortLabel: 'Urutkan berdasarkan',
     tableName: 'Model',
     tableProvider: 'Penyedia',
     tableFamily: 'Family',

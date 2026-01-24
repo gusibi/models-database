@@ -1,0 +1,358 @@
+{
+  "provider": "qiniu",
+  "url": "https://www.qiniu.com/ai/models",
+  "currency": "CNY",
+  "retrieved_at": "2026-01-22T15:05:00Z",
+  "models": [
+    {
+      "model": "Deepseek/DeepSeek-V3.2",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 3
+    },
+    {
+      "model": "Minimax/Minimax-M2.1",
+      "pricing_type": "token",
+      "input_price": 2.1,
+      "output_price": 8.4
+    },
+    {
+      "model": "Mimo-V2-Flash",
+      "pricing_type": "free"
+    },
+    {
+      "model": "Kimi-K2-Thinking",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 16
+    },
+    {
+      "model": "Z-Ai/GLM-4.7",
+      "pricing_type": "token",
+      "input_price": 3.168,
+      "output_price": 12.528
+    },
+    {
+      "model": "Qwen3-Max",
+      "pricing_type": "token",
+      "input_price": 6,
+      "output_price": 24
+    },
+    {
+      "model": "Minimax/Minimax-M2",
+      "pricing_type": "token",
+      "input_price": 2.1,
+      "output_price": 8.4
+    },
+    {
+      "model": "Z-AI/GLM-4.6",
+      "pricing_type": "token",
+      "input_price": 7.2,
+      "output_price": 12.6
+    },
+    {
+      "model": "gpt-oss-20b",
+      "pricing_type": "token",
+      "input_price": 0.72,
+      "output_price": 3.6
+    },
+    {
+      "model": "gpt-oss-120b",
+      "pricing_type": "token",
+      "input_price": 1.08,
+      "output_price": 5.4
+    },
+    {
+      "model": "DeepSeek/DeepSeek-V3.1-Terminus",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 12
+    },
+    {
+      "model": "DeepSeek/DeepSeek-V3.2-Exp-Thinking",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 3
+    },
+    {
+      "model": "DeepSeek/DeepSeek-V3.1-Terminus-Thinking",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 12
+    },
+    {
+      "model": "DeepSeek-V3.1",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 12
+    },
+    {
+      "model": "DeepSeek-R1-0528",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 16
+    },
+    {
+      "model": "DeepSeek-V3-0324",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 8
+    },
+    {
+      "model": "DeepSeek-R1",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 16
+    },
+    {
+      "model": "Doubao-1.5-Vision-Pro",
+      "pricing_type": "token",
+      "input_price": 3,
+      "output_price": 9
+    },
+    {
+      "model": "Doubao-Seed-1.6-Thinking",
+      "pricing_type": "token",
+      "input_price": 0.8,
+      "output_price": 8
+    },
+    {
+      "model": "Deepseek/Deepseek-Math-V2",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 16
+    },
+    {
+      "model": "Doubao-1.5-Pro-32k",
+      "pricing_type": "token",
+      "input_price": 0.8,
+      "output_price": 2
+    },
+    {
+      "model": "Doubao-1.5-Thinking-Pro",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 16
+    },
+    {
+      "model": "Doubao-Seed-1.6",
+      "pricing_type": "token",
+      "input_price": 0.8,
+      "output_price": 2
+    },
+    {
+      "model": "Doubao-Seed-1.6-Flash",
+      "pricing_type": "token",
+      "input_price": 0.15,
+      "output_price": 1.5
+    },
+    {
+      "model": "Qwen-VL-MAX-2025-01-25",
+      "pricing_type": "token",
+      "input_price": 3,
+      "output_price": 9
+    },
+    {
+      "model": "Qwen-2.5-VL-7B-Instruct",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 5
+    },
+    {
+      "model": "Qwen-Turbo",
+      "pricing_type": "token",
+      "input_price": 0.3,
+      "output_price": 1.2
+    },
+    {
+      "model": "Qwen2.5-Max-2025-01-25",
+      "pricing_type": "token",
+      "input_price": 2.4,
+      "output_price": 9.6
+    },
+    {
+      "model": "Qwen-3-235B-A22B",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 8
+    },
+    {
+      "model": "Qwen3-235b-A22B-Instruct-2507",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 8
+    },
+    {
+      "model": "Qwen3-Coder-480B-A35B-Instruct",
+      "pricing_type": "token",
+      "input_price": 6,
+      "output_price": 24
+    },
+    {
+      "model": "Qwen3-Next-80B-A3B-Instruct",
+      "pricing_type": "token",
+      "input_price": 1,
+      "output_price": 4
+    },
+    {
+      "model": "Qwen-2.5-VL-72B-Instruct",
+      "pricing_type": "token",
+      "input_price": 16,
+      "output_price": 48
+    },
+    {
+      "model": "Qwen3-235B-A22B-Thinking-2507",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 20
+    },
+    {
+      "model": "Qwen3-Next-80B-A3B-Thinking",
+      "pricing_type": "token",
+      "input_price": 1,
+      "output_price": 10
+    },
+    {
+      "model": "Qwen3-32B",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 8
+    },
+    {
+      "model": "Qwen3-30B-A3B",
+      "pricing_type": "token",
+      "input_price": 0.75,
+      "output_price": 3
+    },
+    {
+      "model": "Qwen3-Max-Preview",
+      "pricing_type": "token",
+      "input_price": 6,
+      "output_price": 24
+    },
+    {
+      "model": "MiniMax-M1",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 16
+    },
+    {
+      "model": "GLM-4.5-Air",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 8
+    },
+    {
+      "model": "GLM-4.5",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 16
+    },
+    {
+      "model": "Kimi-K2",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 16
+    },
+    {
+      "model": "Kimi-K2-0905",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 16
+    },
+    {
+      "model": "kling-v2-1",
+      "pricing_type": "per_second",
+      "price": 0.4,
+      "price_unit": "second"
+    },
+    {
+      "model": "Kling-V2-5-Turbo",
+      "pricing_type": "per_second",
+      "price": 0.3,
+      "price_unit": "second"
+    },
+    {
+      "model": "Kling-V2-New",
+      "pricing_type": "per_image",
+      "price": 0.1,
+      "price_unit": "image"
+    },
+    {
+      "model": "Kling-V1-5",
+      "pricing_type": "per_image",
+      "price": 0.025,
+      "price_unit": "image"
+    },
+    {
+      "model": "Kling-V2",
+      "pricing_type": "per_image",
+      "price": 0.1,
+      "price_unit": "image"
+    },
+    {
+      "model": "Kling-V1",
+      "pricing_type": "per_image",
+      "price": 0.025,
+      "price_unit": "image"
+    },
+    {
+      "model": "Meituan/Longcat-Flash-Chat",
+      "pricing_type": "free"
+    },
+    {
+      "model": "Z-Ai/Autoglm-Phone-9b",
+      "pricing_type": "token",
+      "input_price": 0.6,
+      "output_price": 1.2
+    },
+    {
+      "model": "DeepSeek-V3",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 8
+    },
+    {
+      "model": "Kling-Video-O1",
+      "pricing_type": "per_second",
+      "price": 0.6,
+      "price_unit": "second"
+    },
+    {
+      "model": "DeepSeek/DeepSeek-V3.2-Exp",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 3
+    },
+    {
+      "model": "Kling-V2-6",
+      "pricing_type": "per_second",
+      "price": 0.5,
+      "price_unit": "second"
+    },
+    {
+      "model": "Stepfun-Ai/Gelab-Zero-4b-Preview",
+      "pricing_type": "token",
+      "input_price": 0.6,
+      "output_price": 1.2
+    },
+    {
+      "model": "ASR",
+      "pricing_type": "per_minute",
+      "price": 0.08,
+      "price_unit": "minute"
+    },
+    {
+      "model": "TTS",
+      "pricing_type": "per_chars",
+      "price": 0.06,
+      "price_unit": "100chars"
+    },
+    {
+      "model": "Baidu-Search-API",
+      "pricing_type": "per_request",
+      "price": 0.036,
+      "price_unit": "request"
+    }
+  ]
+}

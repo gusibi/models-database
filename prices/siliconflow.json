@@ -1,0 +1,522 @@
+{
+  "provider": "siliconflow",
+  "url": "https://www.siliconflow.cn/pricing",
+  "currency": "CNY",
+  "retrieved_at": "2026-01-22T15:10:00Z",
+  "models": [
+    {
+      "model": "Qwen/Qwen3-8B",
+      "pricing_type": "free"
+    },
+    {
+      "model": "deepseek-ai/DeepSeek-OCR",
+      "pricing_type": "free"
+    },
+    {
+      "model": "tencent/Hunyuan-MT-7B",
+      "pricing_type": "free"
+    },
+    {
+      "model": "THUDM/GLM-4.1V-9B-Thinking",
+      "pricing_type": "free"
+    },
+    {
+      "model": "deepseek-ai/DeepSeek-R1-0528-Qwen3-8B",
+      "pricing_type": "free"
+    },
+    {
+      "model": "THUDM/GLM-Z1-9B-0414",
+      "pricing_type": "free"
+    },
+    {
+      "model": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+      "pricing_type": "free"
+    },
+    {
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "pricing_type": "free"
+    },
+    {
+      "model": "Qwen/Qwen2.5-Coder-7B-Instruct",
+      "pricing_type": "free"
+    },
+    {
+      "model": "THUDM/GLM-4-9B-0414",
+      "pricing_type": "free"
+    },
+    {
+      "model": "internlm/internlm2_5-7b-chat",
+      "pricing_type": "free"
+    },
+    {
+      "model": "THUDM/glm-4-9b-chat",
+      "pricing_type": "free"
+    },
+    {
+      "model": "Qwen/Qwen2-7B-Instruct",
+      "pricing_type": "free"
+    },
+    {
+      "model": "Pro/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+      "pricing_type": "token",
+      "input_price": 0.35,
+      "output_price": 0.35
+    },
+    {
+      "model": "Pro/Qwen/Qwen2.5-Coder-7B-Instruct",
+      "pricing_type": "token",
+      "input_price": 0.35,
+      "output_price": 0.35
+    },
+    {
+      "model": "Pro/Qwen/Qwen2.5-VL-7B-Instruct",
+      "pricing_type": "token",
+      "input_price": 0.35,
+      "output_price": 0.35
+    },
+    {
+      "model": "Pro/Qwen/Qwen2.5-7B-Instruct",
+      "pricing_type": "token",
+      "input_price": 0.35,
+      "output_price": 0.35
+    },
+    {
+      "model": "Pro/Qwen/Qwen2-7B-Instruct",
+      "pricing_type": "token",
+      "input_price": 0.35,
+      "output_price": 0.35
+    },
+    {
+      "model": "Pro/THUDM/glm-4-9b-chat",
+      "pricing_type": "token",
+      "input_price": 0.60,
+      "output_price": 0.60
+    },
+    {
+      "model": "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
+      "pricing_type": "token",
+      "input_price": 0.70,
+      "output_price": 0.70
+    },
+    {
+      "model": "Qwen/Qwen2.5-14B-Instruct",
+      "pricing_type": "token",
+      "input_price": 0.70,
+      "output_price": 0.70
+    },
+    {
+      "model": "deepseek-ai/deepseek-vl2",
+      "pricing_type": "token",
+      "input_price": 0.99,
+      "output_price": 0.99
+    },
+    {
+      "model": "Pro/THUDM/GLM-4.1V-9B-Thinking",
+      "pricing_type": "token",
+      "input_price": 0.25,
+      "output_price": 1.00
+    },
+    {
+      "model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+      "pricing_type": "token",
+      "input_price": 1.26,
+      "output_price": 1.26
+    },
+    {
+      "model": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+      "pricing_type": "token",
+      "input_price": 1.26,
+      "output_price": 1.26
+    },
+    {
+      "model": "Qwen/Qwen2.5-32B-Instruct",
+      "pricing_type": "token",
+      "input_price": 1.26,
+      "output_price": 1.26
+    },
+    {
+      "model": "deepseek-ai/DeepSeek-V2.5",
+      "pricing_type": "token",
+      "input_price": 1.33,
+      "output_price": 1.33
+    },
+    {
+      "model": "Qwen/Qwen2.5-VL-32B-Instruct",
+      "pricing_type": "token",
+      "input_price": 1.89,
+      "output_price": 1.89
+    },
+    {
+      "model": "THUDM/GLM-4-32B-0414",
+      "pricing_type": "token",
+      "input_price": 1.89,
+      "output_price": 1.89
+    },
+    {
+      "model": "Qwen/Qwen3-VL-8B-Instruct",
+      "pricing_type": "token",
+      "input_price": 0.50,
+      "output_price": 2.00
+    },
+    {
+      "model": "inclusionAI/Ling-mini-2.0",
+      "pricing_type": "token",
+      "input_price": 0.50,
+      "output_price": 2.00
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "pricing_type": "token",
+      "input_price": 0.50,
+      "output_price": 2.00
+    },
+    {
+      "model": "Qwen/Qwen3-VL-30B-A3B-Instruct",
+      "pricing_type": "token",
+      "input_price": 0.70,
+      "output_price": 2.80
+    },
+    {
+      "model": "Qwen/Qwen3-VL-30B-A3B-Thinking",
+      "pricing_type": "token",
+      "input_price": 0.70,
+      "output_price": 2.80
+    },
+    {
+      "model": "Qwen/Qwen3-Omni-30B-A3B-Instruct",
+      "pricing_type": "token",
+      "input_price": 0.70,
+      "output_price": 2.80
+    },
+    {
+      "model": "Qwen/Qwen3-Omni-30B-A3B-Thinking",
+      "pricing_type": "token",
+      "input_price": 0.70,
+      "output_price": 2.80
+    },
+    {
+      "model": "Qwen/Qwen3-Omni-30B-A3B-Captioner",
+      "pricing_type": "token",
+      "input_price": 0.70,
+      "output_price": 2.80
+    },
+    {
+      "model": "Qwen/Qwen3-Coder-30B-A3B-Instruct",
+      "pricing_type": "token",
+      "input_price": 0.70,
+      "output_price": 2.80
+    },
+    {
+      "model": "Qwen/Qwen3-30B-A3B-Instruct-2507",
+      "pricing_type": "token",
+      "input_price": 0.70,
+      "output_price": 2.80
+    },
+    {
+      "model": "Qwen/Qwen3-30B-A3B-Thinking-2507",
+      "pricing_type": "token",
+      "input_price": 0.70,
+      "output_price": 2.80
+    },
+    {
+      "model": "Qwen/Qwen3-30B-A3B",
+      "pricing_type": "token",
+      "input_price": 0.70,
+      "output_price": 2.80
+    },
+    {
+      "model": "Pro/deepseek-ai/DeepSeek-V3.2",
+      "pricing_type": "token",
+      "input_price": 2.00,
+      "output_price": 3.00
+    },
+    {
+      "model": "zai-org/GLM-4.6V",
+      "pricing_type": "token",
+      "input_price": 1.00,
+      "output_price": 3.00
+    },
+    {
+      "model": "deepseek-ai/DeepSeek-V3.2",
+      "pricing_type": "token",
+      "input_price": 2.00,
+      "output_price": 3.00
+    },
+    {
+      "model": "Qwen/Qwen3-VL-32B-Instruct",
+      "pricing_type": "token",
+      "input_price": 1.00,
+      "output_price": 4.00
+    },
+    {
+      "model": "Kwaipilot/KAT-Dev",
+      "pricing_type": "token",
+      "input_price": 1.00,
+      "output_price": 4.00
+    },
+    {
+      "model": "inclusionAI/Ring-flash-2.0",
+      "pricing_type": "token",
+      "input_price": 1.00,
+      "output_price": 4.00
+    },
+    {
+      "model": "inclusionAI/Ling-flash-2.0",
+      "pricing_type": "token",
+      "input_price": 1.00,
+      "output_price": 4.00
+    },
+    {
+      "model": "Qwen/Qwen3-Next-80B-A3B-Instruct",
+      "pricing_type": "token",
+      "input_price": 1.00,
+      "output_price": 4.00
+    },
+    {
+      "model": "Qwen/Qwen3-Next-80B-A3B-Thinking",
+      "pricing_type": "token",
+      "input_price": 1.00,
+      "output_price": 4.00
+    },
+    {
+      "model": "ByteDance-Seed/Seed-OSS-36B-Instruct",
+      "pricing_type": "token",
+      "input_price": 1.50,
+      "output_price": 4.00
+    },
+    {
+      "model": "tencent/Hunyuan-A13B-Instruct",
+      "pricing_type": "token",
+      "input_price": 1.00,
+      "output_price": 4.00
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "pricing_type": "token",
+      "input_price": 1.00,
+      "output_price": 4.00
+    },
+    {
+      "model": "Tongyi-Zhiwen/QwenLong-L1-32B",
+      "pricing_type": "token",
+      "input_price": 1.00,
+      "output_price": 4.00
+    },
+    {
+      "model": "ascend-tribe/pangu-pro-moe",
+      "pricing_type": "token",
+      "input_price": 1.00,
+      "output_price": 4.00
+    },
+    {
+      "model": "THUDM/GLM-Z1-Rumination-32B-0414",
+      "pricing_type": "token",
+      "input_price": 1.00,
+      "output_price": 4.00
+    },
+    {
+      "model": "THUDM/GLM-Z1-32B-0414",
+      "pricing_type": "token",
+      "input_price": 1.00,
+      "output_price": 4.00
+    },
+    {
+      "model": "Qwen/QwQ-32B",
+      "pricing_type": "token",
+      "input_price": 1.00,
+      "output_price": 4.00
+    },
+    {
+      "model": "Qwen/Qwen2.5-72B-Instruct",
+      "pricing_type": "token",
+      "input_price": 4.13,
+      "output_price": 4.13
+    },
+    {
+      "model": "Qwen/Qwen2.5-VL-72B-Instruct",
+      "pricing_type": "token",
+      "input_price": 4.13,
+      "output_price": 4.13
+    },
+    {
+      "model": "Qwen/Qwen2.5-72B-Instruct-128K",
+      "pricing_type": "token",
+      "input_price": 4.13,
+      "output_price": 4.13
+    },
+    {
+      "model": "Qwen/Qwen2-VL-72B-Instruct",
+      "pricing_type": "token",
+      "input_price": 4.13,
+      "output_price": 4.13
+    },
+    {
+      "model": "Qwen/Qwen3-VL-8B-Thinking",
+      "pricing_type": "token",
+      "input_price": 0.50,
+      "output_price": 5.00
+    },
+    {
+      "model": "zai-org/GLM-4.5V",
+      "pricing_type": "token",
+      "input_price": 1.00,
+      "output_price": 6.00
+    },
+    {
+      "model": "zai-org/GLM-4.5-Air",
+      "pricing_type": "token",
+      "input_price": 1.00,
+      "output_price": 6.00
+    },
+    {
+      "model": "Pro/deepseek-ai/DeepSeek-V3",
+      "pricing_type": "token",
+      "input_price": 2.00,
+      "output_price": 8.00
+    },
+    {
+      "model": "deepseek-ai/DeepSeek-V3",
+      "pricing_type": "token",
+      "input_price": 2.00,
+      "output_price": 8.00
+    },
+    {
+      "model": "moonshotai/Kimi-Dev-72B",
+      "pricing_type": "token",
+      "input_price": 2.00,
+      "output_price": 8.00
+    },
+    {
+      "model": "baidu/ERNIE-4.5-300B-A47B",
+      "pricing_type": "token",
+      "input_price": 2.00,
+      "output_price": 8.00
+    },
+    {
+      "model": "Pro/MiniMaxAI/MiniMax-M2.1",
+      "pricing_type": "token",
+      "input_price": 2.10,
+      "output_price": 8.40
+    },
+    {
+      "model": "MiniMaxAI/MiniMax-M2",
+      "pricing_type": "token",
+      "input_price": 2.10,
+      "output_price": 8.40
+    },
+    {
+      "model": "Qwen/QVQ-72B-Preview",
+      "pricing_type": "token",
+      "input_price": 9.90,
+      "output_price": 9.90
+    },
+    {
+      "model": "Qwen/Qwen3-VL-32B-Thinking",
+      "pricing_type": "token",
+      "input_price": 1.00,
+      "output_price": 10.00
+    },
+    {
+      "model": "Qwen/Qwen3-VL-235B-A22B-Instruct",
+      "pricing_type": "token",
+      "input_price": 2.50,
+      "output_price": 10.00
+    },
+    {
+      "model": "Qwen/Qwen3-VL-235B-A22B-Thinking",
+      "pricing_type": "token",
+      "input_price": 2.50,
+      "output_price": 10.00
+    },
+    {
+      "model": "stepfun-ai/step3",
+      "pricing_type": "token",
+      "input_price": 4.00,
+      "output_price": 10.00
+    },
+    {
+      "model": "Qwen/Qwen3-235B-A22B-Thinking-2507",
+      "pricing_type": "token",
+      "input_price": 2.50,
+      "output_price": 10.00
+    },
+    {
+      "model": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+      "pricing_type": "token",
+      "input_price": 2.50,
+      "output_price": 10.00
+    },
+    {
+      "model": "Pro/deepseek-ai/DeepSeek-V3.1-Terminus",
+      "pricing_type": "token",
+      "input_price": 4.00,
+      "output_price": 12.00
+    },
+    {
+      "model": "deepseek-ai/DeepSeek-V3.1-Terminus",
+      "pricing_type": "token",
+      "input_price": 4.00,
+      "output_price": 12.00
+    },
+    {
+      "model": "zai-org/GLM-4.6",
+      "pricing_type": "token",
+      "input_price": 3.50,
+      "output_price": 14.00
+    },
+    {
+      "model": "Pro/moonshotai/Kimi-K2-Instruct-0905",
+      "pricing_type": "token",
+      "input_price": 4.00,
+      "output_price": 16.00
+    },
+    {
+      "model": "Pro/moonshotai/Kimi-K2-Thinking",
+      "pricing_type": "token",
+      "input_price": 4.00,
+      "output_price": 16.00
+    },
+    {
+      "model": "Pro/deepseek-ai/DeepSeek-R1",
+      "pricing_type": "token",
+      "input_price": 4.00,
+      "output_price": 16.00
+    },
+    {
+      "model": "Pro/zai-org/GLM-4.7",
+      "pricing_type": "token",
+      "input_price": 4.00,
+      "output_price": 16.00
+    },
+    {
+      "model": "moonshotai/Kimi-K2-Thinking",
+      "pricing_type": "token",
+      "input_price": 4.00,
+      "output_price": 16.00
+    },
+    {
+      "model": "moonshotai/Kimi-K2-Instruct-0905",
+      "pricing_type": "token",
+      "input_price": 4.00,
+      "output_price": 16.00
+    },
+    {
+      "model": "deepseek-ai/DeepSeek-R1",
+      "pricing_type": "token",
+      "input_price": 4.00,
+      "output_price": 16.00
+    },
+    {
+      "model": "Qwen/Qwen3-Coder-480B-A35B-Instruct",
+      "pricing_type": "token",
+      "input_price": 8.00,
+      "output_price": 16.00
+    },
+    {
+      "model": "MiniMaxAI/MiniMax-M1-80k",
+      "pricing_type": "token",
+      "input_price": 4.00,
+      "output_price": 16.00
+    }
+  ]
+}

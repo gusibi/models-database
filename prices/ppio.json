@@ -1,0 +1,398 @@
+{
+  "provider": "ppio",
+  "url": "https://ppio.com/ai-computing/llm-api",
+  "currency": "CNY",
+  "retrieved_at": "2026-01-22T15:00:00Z",
+  "models": [
+    {
+      "model": "zai-org/glm-4.7-flash",
+      "pricing_type": "token",
+      "input_price": 0.5,
+      "output_price": 0.1,
+      "cache_price": 3,
+      "context_length": 200000
+    },
+    {
+      "model": "MiniMax-M2.1",
+      "pricing_type": "token",
+      "input_price": 2.1,
+      "output_price": 0.21,
+      "cache_price": 8.4,
+      "context_length": 204800
+    },
+    {
+      "model": "zai-org/glm-4.7",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 0.8,
+      "cache_price": 16,
+      "context_length": 204800
+    },
+    {
+      "model": "XiaomiMiMo/MiMo-V2-Flash",
+      "pricing_type": "token",
+      "input_price": 0.7,
+      "output_price": 2.1,
+      "context_length": 262144
+    },
+    {
+      "model": "zai-org/autoglm-phone-9b-multilingual",
+      "pricing_type": "token",
+      "input_price": 0.25,
+      "output_price": 1,
+      "context_length": 65536
+    },
+    {
+      "model": "Deepseek-V3.2",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 3,
+      "context_length": 163840
+    },
+    {
+      "model": "Kimi-K2-Thinking",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 1,
+      "cache_price": 16,
+      "context_length": 262144
+    },
+    {
+      "model": "MiniMax-M2",
+      "pricing_type": "token",
+      "input_price": 2.1,
+      "output_price": 0.21,
+      "cache_price": 8.4,
+      "context_length": 204800
+    },
+    {
+      "model": "Deepseek-V3.2-Exp",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 3,
+      "context_length": 163840
+    },
+    {
+      "model": "qwen/qwen3-omni-30b-a3b-thinking",
+      "pricing_type": "token",
+      "input_price": 1.8,
+      "output_price": 6.9,
+      "context_length": 65536
+    },
+    {
+      "model": "qwen/qwen3-vl-235b-a22b-thinking",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 20,
+      "context_length": 131072
+    },
+    {
+      "model": "qwen/qwen3-vl-235b-a22b-instruct",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 8,
+      "context_length": 131072
+    },
+    {
+      "model": "Deepseek-V3.1-Terminus",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 2,
+      "cache_price": 12,
+      "context_length": 131072
+    },
+    {
+      "model": "zai-org/glm-4.6v",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 0.4,
+      "cache_price": 6,
+      "context_length": 131072
+    },
+    {
+      "model": "zai-org/glm-4.6",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 0.8,
+      "cache_price": 16,
+      "context_length": 204800
+    },
+    {
+      "model": "KAT-Coder-Pro-V1",
+      "pricing_type": "token",
+      "input_price": 2.1,
+      "output_price": 0.42,
+      "cache_price": 8.4,
+      "context_length": 256000
+    },
+    {
+      "model": "Deepseek-V3-0324",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 0.6,
+      "cache_price": 8,
+      "context_length": 163840
+    },
+    {
+      "model": "Kimi-K2-0905",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 16,
+      "context_length": 262144
+    },
+    {
+      "model": "Deepseek-V3.1",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 2,
+      "cache_price": 12,
+      "context_length": 131072
+    },
+    {
+      "model": "qwen/qwen3-coder-480b-a35b-instruct",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 16,
+      "context_length": 262144
+    },
+    {
+      "model": "Kimi-K2-Instruct",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 16,
+      "context_length": 131072
+    },
+    {
+      "model": "qwen/qwen3-235b-a22b-thinking-2507",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 20,
+      "context_length": 131072
+    },
+    {
+      "model": "qwen/qwen3-235b-a22b-instruct-2507",
+      "pricing_type": "token",
+      "input_price": 1.45,
+      "output_price": 5.8,
+      "context_length": 262144
+    },
+    {
+      "model": "zai-org/glm-4.5v",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 0.8,
+      "cache_price": 12,
+      "context_length": 65536
+    },
+    {
+      "model": "zai-org/glm-4.5",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 0.8,
+      "cache_price": 16,
+      "context_length": 131072
+    },
+    {
+      "model": "MiniMax-M1-80k",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 16,
+      "context_length": 128000
+    },
+    {
+      "model": "qwen/qwen3-235b-a22b-fp8",
+      "pricing_type": "token",
+      "input_price": 1.45,
+      "output_price": 5.8,
+      "context_length": 40960
+    },
+    {
+      "model": "qwen/qwen3-32b-fp8",
+      "pricing_type": "token",
+      "input_price": 0.72,
+      "output_price": 3.26,
+      "context_length": 128000
+    },
+    {
+      "model": "qwen/qwen3-30b-a3b-fp8",
+      "pricing_type": "token",
+      "input_price": 0.72,
+      "output_price": 3.26,
+      "context_length": 128000
+    },
+    {
+      "model": "Deepseek-Prover-V2-671B",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 16,
+      "context_length": 160000
+    },
+    {
+      "model": "qwen/qwen3-coder-30b-a3b-instruct",
+      "pricing_type": "token",
+      "input_price": 2.25,
+      "output_price": 9,
+      "context_length": 262144
+    },
+    {
+      "model": "DeepSeek-R1-Turbo",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 16,
+      "context_length": 64000
+    },
+    {
+      "model": "deepseek/deepseek-r1-0528",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 16,
+      "context_length": 163840
+    },
+    {
+      "model": "DeepSeek-V3-Turbo",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 8,
+      "context_length": 64000
+    },
+    {
+      "model": "qwen/qwen3-next-80b-a3b-instruct",
+      "pricing_type": "token",
+      "input_price": 1,
+      "output_price": 4,
+      "context_length": 65536
+    },
+    {
+      "model": "qwen/qwen3-next-80b-a3b-thinking",
+      "pricing_type": "token",
+      "input_price": 1,
+      "output_price": 10,
+      "context_length": 65536
+    },
+    {
+      "model": "DeepSeek-V3-Community",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 8,
+      "context_length": 64000
+    },
+    {
+      "model": "DeepSeek-R1-Community",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 16,
+      "context_length": 64000
+    },
+    {
+      "model": "ERNIE-4.5-VL-424B-A47B",
+      "pricing_type": "token",
+      "input_price": 3,
+      "output_price": 9,
+      "context_length": 123000
+    },
+    {
+      "model": "baidu/ernie-4.5-300b-a47b-paddle",
+      "pricing_type": "token",
+      "input_price": 2,
+      "output_price": 7,
+      "context_length": 123000
+    },
+    {
+      "model": "DeepSeek-R1-Distill-Llama-70B",
+      "pricing_type": "token",
+      "input_price": 5.8,
+      "output_price": 5.8,
+      "context_length": 32000
+    },
+    {
+      "model": "qwen/qwen-2.5-72b-instruct",
+      "pricing_type": "token",
+      "input_price": 4,
+      "output_price": 12,
+      "context_length": 32000
+    },
+    {
+      "model": "qwen/qwen2.5-vl-72b-instruct",
+      "pricing_type": "token",
+      "input_price": 4.2,
+      "output_price": 4.2,
+      "context_length": 32000
+    },
+    {
+      "model": "qwen/qwen2.5-7b-instruct",
+      "pricing_type": "token",
+      "input_price": 0.35,
+      "output_price": 0.35,
+      "context_length": 32000
+    },
+    {
+      "model": "Ernie-4.5-21B-A3B-Thinking",
+      "pricing_type": "token",
+      "input_price": 0.5,
+      "output_price": 2,
+      "context_length": 131072
+    },
+    {
+      "model": "qwen/qwen3-vl-8b-instruct",
+      "pricing_type": "token",
+      "input_price": 0.5,
+      "output_price": 2,
+      "context_length": 131072
+    },
+    {
+      "model": "zai-org/glm-4.5-air",
+      "pricing_type": "token",
+      "input_price": 1.2,
+      "output_price": 0.24,
+      "cache_price": 2,
+      "context_length": 131072
+    },
+    {
+      "model": "qwen/qwen3-vl-30b-a3b-thinking",
+      "pricing_type": "token",
+      "input_price": 0.75,
+      "output_price": 7.5,
+      "context_length": 131072
+    },
+    {
+      "model": "qwen/qwen3-vl-30b-a3b-instruct",
+      "pricing_type": "token",
+      "input_price": 0.75,
+      "output_price": 3,
+      "context_length": 131072
+    },
+    {
+      "model": "qwen/qwen3-omni-30b-a3b-instruct",
+      "pricing_type": "token",
+      "input_price": 1.8,
+      "output_price": 6.9,
+      "context_length": 65536
+    },
+    {
+      "model": "ERNIE-4.5-0.3B",
+      "pricing_type": "free",
+      "context_length": 120000
+    },
+    {
+      "model": "ERNIE-4.5-21B-A3B",
+      "pricing_type": "token",
+      "input_price": 0.5,
+      "output_price": 2,
+      "context_length": 120000
+    },
+    {
+      "model": "ERNIE-4.5-VL-28B-A3B",
+      "pricing_type": "token",
+      "input_price": 1,
+      "output_price": 4,
+      "context_length": 30000
+    },
+    {
+      "model": "qwen/qwen3-4b-fp8",
+      "pricing_type": "token",
+      "input_price": 0.2145,
+      "output_price": 0.2145,
+      "context_length": 128000
+    }
+  ]
+}

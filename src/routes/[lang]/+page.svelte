@@ -39,7 +39,6 @@
   let providerSearch = $state("");
   let providerDropdownOpen = $state(false);
   let providerDropdownButton = $state<HTMLButtonElement | null>(null);
-  let providerDropdownStyle = $state<string>("");
 
   let maxInputCost = $state<number>(10);
   let maxOutputCost = $state<number>(10);
@@ -87,6 +86,9 @@
   let searchText = $state("");
   let sortBy = $state("name");
   let sortOrder = $state("asc");
+  let showAdvancedFilters = $state(false);
+  let quickContextPreset = $state("any");
+  let quickReleasePreset = $state("any");
 
   // 可显示的字段列表
   let availableFields = $state([
@@ -174,6 +176,12 @@
   let filteredModels = $state<Model[]>([]);
   let displayModels = $state<Model[]>([]);
 
+  type FeatureKey = keyof typeof features;
+
+  const maxCostModel = $derived(getMaxCost(models));
+  const maxContextModel = $derived(getMaxContext(models));
+  const maxOutputModel = $derived(getMaxOutput(models));
+
   $effect(() => {
     displayModels = sortModels(filteredModels);
   });
@@ -188,6 +196,7 @@
   function applyTheme(nextTheme: "light" | "dark") {
     theme = nextTheme;
     document.documentElement.dataset.theme = nextTheme;
+    document.documentElement.classList.toggle("dark", nextTheme === "dark");
     localStorage.setItem("theme", nextTheme);
   }
 
@@ -221,6 +230,71 @@
     return formatTemplate(template, { count });
   }
 
+  $effect(() => {
+    if (minContext === 0) {
+      quickContextPreset = "any";
+    } else if (minContext === 8000) {
+      quickContextPreset = "8k";
+    } else if (minContext === 32000) {
+      quickContextPreset = "32k";
+    } else if (minContext === 128000) {
+      quickContextPreset = "128k";
+    } else if (minContext === 1000000) {
+      quickContextPreset = "1m";
+    } else {
+      quickContextPreset = "custom";
+    }
+  });
+
+  $effect(() => {
+    const presetDates = ["2024-01-01", "2023-01-01", "2022-01-01"];
+    if (!minReleaseDate) {
+      quickReleasePreset = "any";
+    } else if (presetDates.includes(minReleaseDate)) {
+      quickReleasePreset = minReleaseDate;
+    } else {
+      quickReleasePreset = "custom";
+    }
+  });
+
+  function handleQuickContextChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    const value = target.value;
+    const presets: Record<string, number> = {
+      any: 0,
+      "8k": 8000,
+      "32k": 32000,
+      "128k": 128000,
+      "1m": 1000000,
+    };
+
+    if (value === "custom") {
+      showAdvancedFilters = true;
+      return;
+    }
+
+    minContext = presets[value] ?? 0;
+    applyFilters();
+  }
+
+  function handleQuickReleaseChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    const value = target.value;
+
+    if (value === "custom") {
+      showAdvancedFilters = true;
+      return;
+    }
+
+    minReleaseDate = value === "any" ? "" : value;
+    applyFilters();
+  }
+
+  function toggleQuickFeature(key: FeatureKey) {
+    features[key] = features[key] === true ? null : true;
+    applyFilters();
+  }
+
   function getColumnsLabel(count: number) {
     return formatTemplate(t.columnsLabel, { count });
   }
@@ -232,7 +306,7 @@
     } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
       theme = "dark";
     }
-    document.documentElement.dataset.theme = theme;
+    applyTheme(theme as "light" | "dark");
   });
 
   function getMaxOptionalCost(key: keyof Model["properties"]["cost"]): number {
@@ -296,9 +370,9 @@
           ? selectedProviders
           : undefined,
       maxInputCost:
-        maxInputCost < getMaxCost(models).input ? maxInputCost : undefined,
+        maxInputCost < maxCostModel.input ? maxInputCost : undefined,
       maxOutputCost:
-        maxOutputCost < getMaxCost(models).output ? maxOutputCost : undefined,
+        maxOutputCost < maxCostModel.output ? maxOutputCost : undefined,
       maxCacheRead:
         maxCacheReadCost < maxCacheReadCap ? maxCacheReadCost : undefined,
       maxCacheWrite:
@@ -330,7 +404,7 @@
 
   function resetFilters() {
     if (models.length === 0) return;
-    const maxCost = getMaxCost(models);
+    const maxCost = maxCostModel;
 
     maxInputCost = maxCost.input;
     maxOutputCost = maxCost.output;
@@ -364,17 +438,6 @@
     showFieldSelector = false;
 
     applyFilters();
-  }
-
-  function portal(node: HTMLElement) {
-    document.body.appendChild(node);
-    return {
-      destroy() {
-        if (node.parentNode) {
-          node.parentNode.removeChild(node);
-        }
-      },
-    };
   }
 
   function toggleProvider(providerId: string) {
@@ -459,15 +522,6 @@
 
   function toggleProviderDropdown() {
     providerDropdownOpen = !providerDropdownOpen;
-    if (providerDropdownOpen && providerDropdownButton) {
-      // Small delay to ensure the button position is computed after DOM update
-      setTimeout(() => {
-        if (providerDropdownButton) {
-          const rect = providerDropdownButton.getBoundingClientRect();
-          providerDropdownStyle = `top: ${rect.bottom + 4}px; left: ${rect.left}px;`;
-        }
-      }, 0);
-    }
   }
 
   // Close dropdown when clicking outside
@@ -521,833 +575,1332 @@
     availableFields = availableFields.map((f) => ({ ...f, visible: false }));
   }
 
+  function clearFilterChip(id: string) {
+    const maxCost = maxCostModel;
+    switch (id) {
+      case "search":
+        searchText = "";
+        break;
+      case "providers":
+        selectedProviders = allProviders.map((p) => p.id);
+        break;
+      case "free":
+        freeOnly = false;
+        break;
+      case "context":
+        minContext = 0;
+        break;
+      case "output":
+        minOutput = 0;
+        break;
+      case "release":
+        minReleaseDate = "";
+        break;
+      case "vision":
+        features.vision = null;
+        break;
+      case "audio":
+        features.audio = null;
+        break;
+      case "reasoning":
+        features.reasoning = null;
+        break;
+      case "video":
+        features.video = null;
+        break;
+      case "code":
+        features.code = null;
+        break;
+      case "toolCall":
+        features.toolCall = null;
+        break;
+      case "structuredOutput":
+        features.structuredOutput = null;
+        break;
+      case "temperature":
+        features.temperature = null;
+        break;
+      case "openWeights":
+        openWeightsOnly = false;
+        break;
+      case "knowledge":
+        knowledgeOnly = false;
+        break;
+      case "interleaved":
+        interleavedOnly = false;
+        break;
+      case "maxInputCost":
+        maxInputCost = maxCost.input;
+        break;
+      case "maxOutputCost":
+        maxOutputCost = maxCost.output;
+        break;
+      case "maxCacheReadCost":
+        maxCacheReadCost = maxCacheReadCap;
+        break;
+      case "maxCacheWriteCost":
+        maxCacheWriteCost = maxCacheWriteCap;
+        break;
+      case "maxReasoningCost":
+        maxReasoningCost = maxReasoningCap;
+        break;
+      case "maxInputAudioCost":
+        maxInputAudioCost = maxInputAudioCap;
+        break;
+      case "maxOutputAudioCost":
+        maxOutputAudioCost = maxOutputAudioCap;
+        break;
+      default:
+        break;
+    }
+
+    applyFilters();
+  }
+
+  const activeFilterChips = $derived.by(() => {
+    const chips: { id: string; label: string }[] = [];
+    const maxCost = maxCostModel;
+
+    if (searchText.trim()) {
+      chips.push({
+        id: "search",
+        label: `${t.groupSearch}: ${searchText.trim()}`,
+      });
+    }
+
+    if (
+      selectedProviders.length > 0 &&
+      selectedProviders.length < allProviders.length
+    ) {
+      chips.push({
+        id: "providers",
+        label: getProvidersCountLabel(
+          selectedProviders.length,
+          allProviders.length,
+        ),
+      });
+    }
+
+    if (freeOnly) {
+      chips.push({ id: "free", label: t.freeLabel });
+    }
+
+    if (minContext > 0) {
+      chips.push({
+        id: "context",
+        label: `${t.tableContext} ≥ ${formatNumber(minContext)}`,
+      });
+    }
+
+    if (minOutput > 0) {
+      chips.push({
+        id: "output",
+        label: `${t.tableOutput} ≥ ${formatNumber(minOutput)}`,
+      });
+    }
+
+    if (minReleaseDate) {
+      chips.push({
+        id: "release",
+        label: `${t.labelReleasedAfter}: ${minReleaseDate}`,
+      });
+    }
+
+    if (features.vision === true) {
+      chips.push({ id: "vision", label: t.featureVision });
+    }
+
+    if (features.audio === true) {
+      chips.push({ id: "audio", label: t.featureAudio });
+    }
+
+    if (features.reasoning === true) {
+      chips.push({ id: "reasoning", label: t.featureReasoning });
+    }
+
+    if (features.video === true) {
+      chips.push({ id: "video", label: t.featureVideo });
+    }
+
+    if (features.code === true) {
+      chips.push({ id: "code", label: t.featureCode });
+    }
+
+    if (features.toolCall === true) {
+      chips.push({ id: "toolCall", label: t.featureTool });
+    }
+
+    if (features.structuredOutput === true) {
+      chips.push({ id: "structuredOutput", label: t.featureStruct });
+    }
+
+    if (features.temperature === true) {
+      chips.push({ id: "temperature", label: t.featureTemp });
+    }
+
+    if (openWeightsOnly) {
+      chips.push({ id: "openWeights", label: t.featureOpen });
+    }
+
+    if (knowledgeOnly) {
+      chips.push({ id: "knowledge", label: t.labelHasKnowledge });
+    }
+
+    if (interleavedOnly) {
+      chips.push({ id: "interleaved", label: t.labelInterleaved });
+    }
+
+    if (maxInputCost < maxCost.input) {
+      chips.push({
+        id: "maxInputCost",
+        label: `${t.sortInputCost} ≤ ${formatCost(maxInputCost, t.freeLabel)}`,
+      });
+    }
+
+    if (maxOutputCost < maxCost.output) {
+      chips.push({
+        id: "maxOutputCost",
+        label: `${t.sortOutputCost} ≤ ${formatCost(maxOutputCost, t.freeLabel)}`,
+      });
+    }
+
+    if (maxCacheReadCost < maxCacheReadCap) {
+      chips.push({
+        id: "maxCacheReadCost",
+        label: `${t.labelCacheRead} ≤ ${formatCost(
+          maxCacheReadCost,
+          t.freeLabel,
+        )}`,
+      });
+    }
+
+    if (maxCacheWriteCost < maxCacheWriteCap) {
+      chips.push({
+        id: "maxCacheWriteCost",
+        label: `${t.labelCacheWrite} ≤ ${formatCost(
+          maxCacheWriteCost,
+          t.freeLabel,
+        )}`,
+      });
+    }
+
+    if (maxReasoningCost < maxReasoningCap) {
+      chips.push({
+        id: "maxReasoningCost",
+        label: `${t.labelReasoning} ≤ ${formatCost(
+          maxReasoningCost,
+          t.freeLabel,
+        )}`,
+      });
+    }
+
+    if (maxInputAudioCost < maxInputAudioCap) {
+      chips.push({
+        id: "maxInputAudioCost",
+        label: `${t.labelAudioIn} ≤ ${formatCost(
+          maxInputAudioCost,
+          t.freeLabel,
+        )}`,
+      });
+    }
+
+    if (maxOutputAudioCost < maxOutputAudioCap) {
+      chips.push({
+        id: "maxOutputAudioCost",
+        label: `${t.labelAudioOut} ≤ ${formatCost(
+          maxOutputAudioCost,
+          t.freeLabel,
+        )}`,
+      });
+    }
+
+    return chips;
+  });
+
   const filteredProviders = $derived.by(() => {
     const result = allProviders.filter(
       (p) =>
         p.name.toLowerCase().includes(providerSearch.toLowerCase()) ||
         p.id.toLowerCase().includes(providerSearch.toLowerCase()),
     );
-    console.log("Filtered providers:", result.length, result);
     return result;
   });
 </script>
 
-<div class="container">
-  <header class="hero">
-    <div class="header-actions">
-      <label class="header-select">
-        <span class="sr-only">{t.languageLabel}</span>
-        <select value={lang} onchange={handleLanguageChange}>
-          {#each languages as language}
-            <option value={language.id}>{language.label}</option>
-          {/each}
-        </select>
-      </label>
-      <button
-        class="theme-toggle"
-        type="button"
-        onclick={toggleTheme}
-        aria-label={t.themeToggle}
+<div class="container flex min-h-screen flex-col">
+  <main class="flex-1">
+    <header class="hero">
+      <div
+        class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between"
       >
-        {theme === "dark" ? t.themeDark : t.themeLight}
-      </button>
-    </div>
-    <h1>{t.headerTitle}</h1>
-    <p>{t.headerSubtitle}</p>
-    <p class="sr-only">{t.srDescription}</p>
-  </header>
-
-  {#if loading}
-    <div class="loading">
-      <div class="spinner"></div>
-      <p>{t.loading}</p>
-    </div>
-  {:else if error}
-    <div class="error">{error}</div>
-  {:else}
-    <div class="filters">
-      <div class="filter-group">
-        <div class="filter-group-title">{t.groupSearch}</div>
-        <div class="filter-group-body">
-          <div class="filter-item filter-search">
+        <div class="flex items-center gap-4">
+          <div
+            class="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-sm font-semibold text-white dark:bg-slate-100 dark:text-slate-900"
+          >
+            AI
+          </div>
+          <div>
+            <h1
+              class="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100"
+            >
+              {t.headerTitle}
+            </h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400">
+              {t.headerSubtitle}
+            </p>
+          </div>
+        </div>
+        <div class="w-full lg:max-w-2xl">
+          <label class="sr-only" for="main-search">{t.searchLabel}</label>
+          <div class="relative">
+            <span
+              class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+              aria-hidden="true">⌕</span
+            >
             <input
+              id="main-search"
               type="text"
               placeholder={t.searchPlaceholder}
               bind:value={searchText}
-              class="search-input compact"
+              class="w-full rounded-full border border-slate-200 bg-white/80 px-11 py-3 text-base text-slate-900 shadow-sm outline-none ring-slate-400/20 focus:ring-2 placeholder:text-slate-400 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:ring-slate-200/20 dark:placeholder:text-slate-500"
               oninput={applyFilters}
             />
           </div>
         </div>
-      </div>
-
-      <div class="filter-group">
-        <div class="filter-group-title">{t.groupProviders}</div>
-        <div class="filter-group-body">
-          <div class="filter-item filter-providers">
-            <div class="provider-dropdown">
-              <button
-                bind:this={providerDropdownButton}
-                class="dropdown-toggle compact"
-                onclick={toggleProviderDropdown}
-              >
-                <span
-                  >{getProvidersCountLabel(
-                    selectedProviders.length,
-                    allProviders.length,
-                  )}</span
-                >
-                <span class="dropdown-arrow">▼</span>
-              </button>
-              {#if providerDropdownOpen}
-                <div
-                  class="dropdown-content"
-                  style={providerDropdownStyle}
-                  use:portal
-                >
-                  <div class="dropdown-actions">
-                    <button class="action-btn" onclick={selectAllProviders}
-                      >{t.labelAll}</button
-                    >
-                    <button class="action-btn" onclick={clearAllProviders}
-                      >{t.labelNone}</button
-                    >
-                  </div>
-                  <input
-                    type="text"
-                    placeholder={t.providerSearchPlaceholder}
-                    bind:value={providerSearch}
-                    class="provider-search compact"
-                  />
-                  <div class="dropdown-list">
-                    {#if allProviders.length === 0}
-                      <div class="dropdown-empty">Loading providers...</div>
-                    {:else if filteredProviders.length === 0}
-                      <div class="dropdown-empty">No providers found</div>
-                    {:else}
-                      {#each filteredProviders as provider}
-                        <div class="dropdown-item">
-                          <label class="provider-checkbox-label">
-                            <input
-                              type="checkbox"
-                              checked={selectedProviders.includes(provider.id)}
-                              onchange={() => toggleProvider(provider.id)}
-                            />
-                            <span class="provider-name">{provider.name}</span>
-                          </label>
-                        </div>
-                      {/each}
-                    {/if}
-                  </div>
-                </div>
-              {/if}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="filter-group">
-        <div class="filter-group-header">
-          <div class="filter-group-title">{t.groupPricing}</div>
-          <label class="free-checkbox free-inline">
-            <input
-              type="checkbox"
-              bind:checked={freeOnly}
-              onchange={applyFilters}
-            />
-            <span>{t.freeLabel}</span>
-          </label>
-        </div>
-        <div class="filter-group-body">
-          <div class="filter-item filter-cost">
-            <div class="compact-range stacked">
-              <span class="range-label">{t.labelInputOutput}:</span>
-              <div class="range-row">
-                <span class="range-sub-label">{t.sortInputCost}</span>
-                <input
-                  type="range"
-                  min="0"
-                  max={getMaxCost(models).input}
-                  step="0.01"
-                  bind:value={maxInputCost}
-                  title={t.sortInputCost}
-                  oninput={applyFilters}
-                />
-                <span class="range-value">${maxInputCost.toFixed(2)}</span>
-              </div>
-              <div class="range-row">
-                <span class="range-sub-label">{t.sortOutputCost}</span>
-                <input
-                  type="range"
-                  min="0"
-                  max={getMaxCost(models).output}
-                  step="0.01"
-                  bind:value={maxOutputCost}
-                  title={t.sortOutputCost}
-                  oninput={applyFilters}
-                />
-                <span class="range-value">${maxOutputCost.toFixed(2)}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="filter-item filter-cost-advanced">
-            <div class="compact-range">
-              <span class="range-label">{t.labelCacheRead}:</span>
-              <input
-                type="range"
-                min="0"
-                max={maxCacheReadCap}
-                step="0.0001"
-                bind:value={maxCacheReadCost}
-                disabled={maxCacheReadCap === 0}
-                oninput={applyFilters}
-              />
-              <span class="range-value"
-                >{formatCost(maxCacheReadCost, t.freeLabel)}</span
-              >
-            </div>
-            <div class="compact-range">
-              <span class="range-label">{t.labelCacheWrite}:</span>
-              <input
-                type="range"
-                min="0"
-                max={maxCacheWriteCap}
-                step="0.0001"
-                bind:value={maxCacheWriteCost}
-                disabled={maxCacheWriteCap === 0}
-                oninput={applyFilters}
-              />
-              <span class="range-value"
-                >{formatCost(maxCacheWriteCost, t.freeLabel)}</span
-              >
-            </div>
-            <div class="compact-range">
-              <span class="range-label">{t.labelReasoning}:</span>
-              <input
-                type="range"
-                min="0"
-                max={maxReasoningCap}
-                step="0.0001"
-                bind:value={maxReasoningCost}
-                disabled={maxReasoningCap === 0}
-                oninput={applyFilters}
-              />
-              <span class="range-value"
-                >{formatCost(maxReasoningCost, t.freeLabel)}</span
-              >
-            </div>
-            <div class="compact-range">
-              <span class="range-label">{t.labelAudioIn}:</span>
-              <input
-                type="range"
-                min="0"
-                max={maxInputAudioCap}
-                step="0.0001"
-                bind:value={maxInputAudioCost}
-                disabled={maxInputAudioCap === 0}
-                oninput={applyFilters}
-              />
-              <span class="range-value"
-                >{formatCost(maxInputAudioCost, t.freeLabel)}</span
-              >
-            </div>
-            <div class="compact-range">
-              <span class="range-label">{t.labelAudioOut}:</span>
-              <input
-                type="range"
-                min="0"
-                max={maxOutputAudioCap}
-                step="0.0001"
-                bind:value={maxOutputAudioCost}
-                disabled={maxOutputAudioCap === 0}
-                oninput={applyFilters}
-              />
-              <span class="range-value"
-                >{formatCost(maxOutputAudioCost, t.freeLabel)}</span
-              >
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="filter-group">
-        <div class="filter-group-title">{t.groupLimits}</div>
-        <div class="filter-group-body">
-          <div class="filter-item filter-context">
-            <div class="compact-range stacked">
-              <span class="range-label">{t.labelContextOutput}:</span>
-              <div class="range-row">
-                <span class="range-sub-label">{t.tableContext}</span>
-                <input
-                  type="range"
-                  min="0"
-                  max={getMaxContext(models)}
-                  step="1000"
-                  bind:value={minContext}
-                  oninput={applyFilters}
-                />
-                <span class="range-value">{formatNumber(minContext)}</span>
-              </div>
-              <div class="range-row">
-                <span class="range-sub-label">{t.tableOutput}</span>
-                <input
-                  type="range"
-                  min="0"
-                  max={getMaxOutput(models)}
-                  step="1000"
-                  bind:value={minOutput}
-                  oninput={applyFilters}
-                />
-                <span class="range-value">{formatNumber(minOutput)}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="filter-group">
-        <div class="filter-group-title">{t.groupCapabilities}</div>
-        <div class="filter-group-body">
-          <div class="filter-item filter-features">
-            <div class="feature-tags">
-              <button
-                class="feature-tag"
-                class:active={features.vision === true}
-                class:inactive={features.vision === false}
-                onclick={() => {
-                  features.vision =
-                    features.vision === true
-                      ? false
-                      : features.vision === false
-                        ? null
-                        : true;
-                  applyFilters();
-                }}
-              >
-                {t.featureVision}
-              </button>
-              <button
-                class="feature-tag"
-                class:active={features.audio === true}
-                class:inactive={features.audio === false}
-                onclick={() => {
-                  features.audio =
-                    features.audio === true
-                      ? false
-                      : features.audio === false
-                        ? null
-                        : true;
-                  applyFilters();
-                }}
-              >
-                {t.featureAudio}
-              </button>
-              <button
-                class="feature-tag"
-                class:active={features.video === true}
-                class:inactive={features.video === false}
-                onclick={() => {
-                  features.video =
-                    features.video === true
-                      ? false
-                      : features.video === false
-                        ? null
-                        : true;
-                  applyFilters();
-                }}
-              >
-                {t.featureVideo}
-              </button>
-              <button
-                class="feature-tag"
-                class:active={features.code === true}
-                class:inactive={features.code === false}
-                onclick={() => {
-                  features.code =
-                    features.code === true
-                      ? false
-                      : features.code === false
-                        ? null
-                        : true;
-                  applyFilters();
-                }}
-              >
-                {t.featureCode}
-              </button>
-              <button
-                class="feature-tag"
-                class:active={features.reasoning === true}
-                class:inactive={features.reasoning === false}
-                onclick={() => {
-                  features.reasoning =
-                    features.reasoning === true
-                      ? false
-                      : features.reasoning === false
-                        ? null
-                        : true;
-                  applyFilters();
-                }}
-              >
-                {t.featureReasoning}
-              </button>
-              <button
-                class="feature-tag"
-                class:active={features.toolCall === true}
-                class:inactive={features.toolCall === false}
-                onclick={() => {
-                  features.toolCall =
-                    features.toolCall === true
-                      ? false
-                      : features.toolCall === false
-                        ? null
-                        : true;
-                  applyFilters();
-                }}
-              >
-                {t.featureTool}
-              </button>
-              <button
-                class="feature-tag"
-                class:active={features.structuredOutput === true}
-                class:inactive={features.structuredOutput === false}
-                onclick={() => {
-                  features.structuredOutput =
-                    features.structuredOutput === true
-                      ? false
-                      : features.structuredOutput === false
-                        ? null
-                        : true;
-                  applyFilters();
-                }}
-              >
-                {t.featureStruct}
-              </button>
-              <button
-                class="feature-tag"
-                class:active={features.temperature === true}
-                class:inactive={features.temperature === false}
-                onclick={() => {
-                  features.temperature =
-                    features.temperature === true
-                      ? false
-                      : features.temperature === false
-                        ? null
-                        : true;
-                  applyFilters();
-                }}
-              >
-                {t.featureTemp}
-              </button>
-              <label class="feature-checkbox">
-                <input
-                  type="checkbox"
-                  bind:checked={openWeightsOnly}
-                  onchange={applyFilters}
-                />
-                <span>{t.featureOpen}</span>
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="filter-group">
-        <div class="filter-group-title">{t.groupMetadata}</div>
-        <div class="filter-group-body">
-          <div class="filter-item filter-release">
-            <label class="range-label" for="release-date"
-              >{t.labelReleasedAfter}:</label
+        <div class="flex items-center gap-2">
+          <div class="relative">
+            <span
+              class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-300"
+              aria-hidden="true">🌐</span
             >
-            <input
-              id="release-date"
-              type="date"
-              bind:value={minReleaseDate}
-              class="date-input compact"
-              onchange={applyFilters}
-            />
+            <select
+              value={lang}
+              onchange={handleLanguageChange}
+              aria-label={t.languageLabel}
+              class="min-h-[44px] rounded-full border border-slate-200 bg-white pl-9 pr-8 text-sm text-slate-700 shadow-sm outline-none ring-slate-400/20 focus:ring-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:ring-slate-200/20"
+            >
+              {#each languages as language}
+                <option value={language.id}>{language.label}</option>
+              {/each}
+            </select>
+            <span
+              class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
+              aria-hidden="true">▾</span
+            >
           </div>
-          <div class="filter-item filter-flags">
-            <label class="feature-checkbox">
-              <input
-                type="checkbox"
-                bind:checked={knowledgeOnly}
-                onchange={applyFilters}
-              />
-              <span>{t.labelHasKnowledge}</span>
-            </label>
-            <label class="feature-checkbox">
-              <input
-                type="checkbox"
-                bind:checked={interleavedOnly}
-                onchange={applyFilters}
-              />
-              <span>{t.labelInterleaved}</span>
-            </label>
-          </div>
+          <button
+            class="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-200 bg-white text-lg text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+            type="button"
+            onclick={toggleTheme}
+            aria-label={t.themeToggle}
+          >
+            <span aria-hidden="true">{theme === "dark" ? "☾" : "☀"}</span>
+          </button>
+          <a
+            class="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-200 bg-white text-lg text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+            href="https://github.com/anomalyco/models.dev"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="GitHub"
+          >
+            <span aria-hidden="true">GH</span>
+          </a>
         </div>
       </div>
-    </div>
+      <p class="sr-only">{t.srDescription}</p>
+    </header>
 
-    <div class="results">
-      <div class="results-header">
-        <div class="results-title">
-          <h2>{getResultsFoundLabel(displayModels.length)}</h2>
+    {#if loading}
+      <div class="loading min-h-[50vh]">
+        <div class="spinner"></div>
+        <p>{t.loading}</p>
+      </div>
+    {:else if error}
+      <div class="error">{error}</div>
+    {:else}
+      <section
+        class="relative z-30 mt-6 rounded-3xl border border-slate-200/70 bg-white/70 p-4 shadow-sm backdrop-blur dark:border-slate-700/80 dark:bg-slate-900/70"
+      >
+        <div class="flex items-center justify-between">
+          <div
+            class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500"
+          >
+            {t.quickFilters}
+          </div>
+          <button
+            class="text-xs font-semibold text-slate-500 underline dark:text-slate-300"
+            type="button"
+            onclick={resetFilters}
+          >
+            {t.resetFilters}
+          </button>
         </div>
-        <div class="results-actions">
-          <div class="field-selector">
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          <div class="provider-dropdown relative">
             <button
-              class="field-selector-toggle"
-              onclick={() => (showFieldSelector = !showFieldSelector)}
+              bind:this={providerDropdownButton}
+              class="flex min-h-[44px] items-center gap-2 rounded-full border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+              onclick={toggleProviderDropdown}
             >
-              <span class="field-icon">⚙</span>
               <span
-                >{getColumnsLabel(
-                  availableFields.filter((f) => f.visible).length,
+                >{getProvidersCountLabel(
+                  selectedProviders.length,
+                  allProviders.length,
                 )}</span
               >
-              <span class="dropdown-arrow">{showFieldSelector ? "▲" : "▼"}</span
-              >
+              <span class="text-slate-400 dark:text-slate-500">▾</span>
             </button>
-            {#if showFieldSelector}
-              <div class="field-selector-dropdown">
-                <div class="field-selector-actions">
-                  <button class="action-btn small" onclick={showAllFields}
-                    >{t.showAll}</button
+            {#if providerDropdownOpen}
+              <div class="dropdown-content absolute left-0 top-full z-50 mt-2">
+                <div class="dropdown-actions">
+                  <button
+                    class="action-btn min-h-[44px] px-3 py-2"
+                    onclick={selectAllProviders}>{t.labelAll}</button
                   >
-                  <button class="action-btn small" onclick={hideAllFields}
-                    >{t.hideAll}</button
+                  <button
+                    class="action-btn min-h-[44px] px-3 py-2"
+                    onclick={clearAllProviders}>{t.labelNone}</button
                   >
                 </div>
-                <div class="field-list">
-                  {#each availableFields as field}
-                    <label class="field-item" class:visible={field.visible}>
-                      <input
-                        type="checkbox"
-                        checked={field.visible}
-                        onchange={() => toggleFieldVisibility(field.id)}
-                      />
-                      <span>{getFieldLabel(field)}</span>
-                    </label>
-                  {/each}
+                <input
+                  type="text"
+                  placeholder={t.providerSearchPlaceholder}
+                  bind:value={providerSearch}
+                  class="provider-search compact"
+                />
+                <div class="dropdown-list">
+                  {#if allProviders.length === 0}
+                    <div class="dropdown-empty">Loading providers...</div>
+                  {:else if filteredProviders.length === 0}
+                    <div class="dropdown-empty">No providers found</div>
+                  {:else}
+                    {#each filteredProviders as provider}
+                      <div class="dropdown-item">
+                        <label class="provider-checkbox-label">
+                          <input
+                            type="checkbox"
+                            checked={selectedProviders.includes(provider.id)}
+                            onchange={() => toggleProvider(provider.id)}
+                          />
+                          <span class="provider-name">{provider.name}</span>
+                        </label>
+                      </div>
+                    {/each}
+                  {/if}
                 </div>
               </div>
             {/if}
           </div>
-          <button class="reset-btn" type="button" onclick={resetFilters}>
-            {t.resetFilters}
+
+          <button
+            class={`min-h-[44px] rounded-full border px-4 text-sm font-medium shadow-sm ${
+              freeOnly
+                ? "border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900"
+                : "border-slate-200 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+            }`}
+            type="button"
+            onclick={() => {
+              freeOnly = !freeOnly;
+              applyFilters();
+            }}
+          >
+            {t.freeLabel}
           </button>
-          <div class="sort-controls">
-            <select class="sort-select" bind:value={sortBy}>
-              <option value="name">{t.sortName}</option>
-              <option value="provider">{t.sortProvider}</option>
-              <option value="family">{t.sortFamily}</option>
-              <option value="cost-input">{t.sortInputCost}</option>
-              <option value="cost-output">{t.sortOutputCost}</option>
-              <option value="context">{t.sortContext}</option>
-              <option value="date">{t.sortReleaseDate}</option>
-            </select>
-            <button
-              class="sort-order-btn"
-              onclick={() => {
-                sortOrder = sortOrder === "asc" ? "desc" : "asc";
-              }}
+
+          <div
+            class="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+          >
+            <span
+              class="text-xs font-semibold uppercase tracking-[0.15em] text-slate-400 dark:text-slate-500"
+              >{t.tableContext}</span
             >
-              {sortOrder === "asc" ? `↓ ${t.sortAsc}` : `↑ ${t.sortDesc}`}
+            <select
+              value={quickContextPreset}
+              onchange={handleQuickContextChange}
+              class="bg-transparent text-sm font-medium text-slate-700 outline-none dark:text-slate-200"
+              aria-label={t.tableContext}
+            >
+              <option value="any">{t.labelAll}</option>
+              <option value="8k">8K</option>
+              <option value="32k">32K</option>
+              <option value="128k">128K</option>
+              <option value="1m">1M</option>
+              <option value="custom">{t.custom}</option>
+            </select>
+          </div>
+
+          <div
+            class="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+          >
+            <span
+              class="text-xs font-semibold uppercase tracking-[0.15em] text-slate-400 dark:text-slate-500"
+              >{t.labelReleasedAfter}</span
+            >
+            <select
+              value={quickReleasePreset}
+              onchange={handleQuickReleaseChange}
+              class="bg-transparent text-sm font-medium text-slate-700 outline-none dark:text-slate-200"
+              aria-label={t.labelReleasedAfter}
+            >
+              <option value="any">{t.labelAll}</option>
+              <option value="2024-01-01">2024+</option>
+              <option value="2023-01-01">2023+</option>
+              <option value="2022-01-01">2022+</option>
+              <option value="custom">{t.custom}</option>
+            </select>
+          </div>
+
+          <button
+            class={`min-h-[44px] rounded-full border px-4 text-sm font-medium shadow-sm ${
+              features.vision === true
+                ? "border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900"
+                : features.vision === false
+                  ? "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-300/50 dark:bg-rose-400/10 dark:text-rose-200"
+                  : "border-slate-200 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+            }`}
+            type="button"
+            onclick={() => toggleQuickFeature("vision")}
+          >
+            👁 {t.featureVision}
+          </button>
+
+          <button
+            class={`min-h-[44px] rounded-full border px-4 text-sm font-medium shadow-sm ${
+              features.audio === true
+                ? "border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900"
+                : features.audio === false
+                  ? "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-300/50 dark:bg-rose-400/10 dark:text-rose-200"
+                  : "border-slate-200 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+            }`}
+            type="button"
+            onclick={() => toggleQuickFeature("audio")}
+          >
+            🎧 {t.featureAudio}
+          </button>
+
+          <button
+            class={`min-h-[44px] rounded-full border px-4 text-sm font-medium shadow-sm ${
+              features.reasoning === true
+                ? "border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900"
+                : features.reasoning === false
+                  ? "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-300/50 dark:bg-rose-400/10 dark:text-rose-200"
+                  : "border-slate-200 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+            }`}
+            type="button"
+            onclick={() => toggleQuickFeature("reasoning")}
+          >
+            🧠 {t.featureReasoning}
+          </button>
+
+          <button
+            class="min-h-[44px] rounded-full border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+            type="button"
+            onclick={() => (showAdvancedFilters = true)}
+          >
+            + {t.moreFilters}
+          </button>
+        </div>
+
+        {#if activeFilterChips.length > 0}
+          <div class="mt-4 flex flex-wrap items-center gap-2">
+            <span
+              class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500"
+              >{t.activeFilters}</span
+            >
+            {#each activeFilterChips as chip}
+              <button
+                class="flex min-h-[36px] items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-xs font-medium text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                type="button"
+                onclick={() => clearFilterChip(chip.id)}
+              >
+                <span>{chip.label}</span>
+                <span aria-hidden="true">×</span>
+              </button>
+            {/each}
+            <button
+              class="text-xs font-semibold text-slate-500 underline dark:text-slate-300"
+              type="button"
+              onclick={resetFilters}
+            >
+              {t.resetFilters}
             </button>
           </div>
-        </div>
-      </div>
+        {/if}
+      </section>
 
-      {#if displayModels.length === 0}
-        <div class="no-results">
-          <h3>{t.noResultsTitle}</h3>
-          <p>{t.noResultsBody}</p>
-        </div>
-      {:else}
-        <div class="table-scroll-wrapper">
-          <!-- 表格容器：独立的滚动区域 -->
+      {#if showAdvancedFilters}
+        <div class="fixed inset-0 z-40">
+          <button
+            class="absolute inset-0 bg-slate-900/40"
+            type="button"
+            aria-label={t.close}
+            onclick={() => (showAdvancedFilters = false)}
+          ></button>
           <div
-            class="table-container"
-            bind:this={tableContainer}
-            onscroll={handleHorizontalScroll}
+            class="absolute right-0 top-0 h-full w-full max-w-2xl overflow-y-auto bg-white p-6 shadow-2xl dark:bg-slate-950"
+            role="dialog"
+            aria-modal="true"
           >
-            <table class="models-table">
-              <thead>
-                <tr>
-                  {#if availableFields.find((f) => f.id === "name")?.visible}
-                    <th class="sortable" onclick={() => toggleSort("name")}>
-                      {t.tableName}
-                      {#if sortBy === "name"}{sortOrder === "asc"
-                          ? "↓"
-                          : "↑"}{/if}
-                    </th>
-                  {/if}
-                  {#if availableFields.find((f) => f.id === "provider")?.visible}
-                    <th class="sortable" onclick={() => toggleSort("provider")}>
-                      {t.tableProvider}
-                      {#if sortBy === "provider"}{sortOrder === "asc"
-                          ? "↓"
-                          : "↑"}{/if}
-                    </th>
-                  {/if}
-                  {#if availableFields.find((f) => f.id === "family")?.visible}
-                    <th class="sortable" onclick={() => toggleSort("family")}>
-                      {t.tableFamily}
-                      {#if sortBy === "family"}{sortOrder === "asc"
-                          ? "↓"
-                          : "↑"}{/if}
-                    </th>
-                  {/if}
-                  {#if availableFields.find((f) => f.id === "costInput")?.visible}
-                    <th
-                      class="sortable"
-                      onclick={() => toggleSort("cost-input")}
+            <div class="flex items-center justify-between">
+              <h2
+                class="text-lg font-semibold text-slate-900 dark:text-slate-100"
+              >
+                {t.moreFilters}
+              </h2>
+              <div class="flex items-center gap-3">
+                <button
+                  class="text-sm font-semibold text-slate-500 underline dark:text-slate-300"
+                  type="button"
+                  onclick={resetFilters}
+                >
+                  {t.resetFilters}
+                </button>
+                <button
+                  class="min-h-[40px] rounded-full border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  type="button"
+                  onclick={() => (showAdvancedFilters = false)}
+                >
+                  {t.close}
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-6 space-y-8">
+              <div class="filter-group">
+                <div class="filter-group-header">
+                  <div class="filter-group-title">{t.groupPricing}</div>
+                  <label class="free-checkbox free-inline">
+                    <input
+                      type="checkbox"
+                      bind:checked={freeOnly}
+                      onchange={applyFilters}
+                    />
+                    <span>{t.freeLabel}</span>
+                  </label>
+                </div>
+                <div class="filter-group-body">
+                  <div class="filter-item filter-cost">
+                    <div class="compact-range stacked">
+                      <span class="range-label">{t.labelInputOutput}:</span>
+                      <div class="range-row">
+                        <span class="range-sub-label">{t.sortInputCost}</span>
+                        <input
+                          type="range"
+                          min="0"
+                          max={maxCostModel.input}
+                          step="0.01"
+                          bind:value={maxInputCost}
+                          title={t.sortInputCost}
+                          oninput={applyFilters}
+                        />
+                        <span class="range-value"
+                          >${maxInputCost.toFixed(2)}</span
+                        >
+                      </div>
+                      <div class="range-row">
+                        <span class="range-sub-label">{t.sortOutputCost}</span>
+                        <input
+                          type="range"
+                          min="0"
+                          max={maxCostModel.output}
+                          step="0.01"
+                          bind:value={maxOutputCost}
+                          title={t.sortOutputCost}
+                          oninput={applyFilters}
+                        />
+                        <span class="range-value"
+                          >${maxOutputCost.toFixed(2)}</span
+                        >
+                      </div>
+
+                      <div class="range-row">
+                        <span class="range-sub-label">{t.labelCacheRead}</span>
+                        <input
+                          type="range"
+                          min="0"
+                          max={maxCacheReadCap}
+                          step="0.0001"
+                          bind:value={maxCacheReadCost}
+                          disabled={maxCacheReadCap === 0}
+                          oninput={applyFilters}
+                        />
+                        <span class="range-value"
+                          >{formatCost(maxCacheReadCost, t.freeLabel)}</span
+                        >
+                      </div>
+                      <div class="range-row">
+                        <span class="range-sub-label">{t.labelCacheWrite}</span>
+                        <input
+                          type="range"
+                          min="0"
+                          max={maxCacheWriteCap}
+                          step="0.0001"
+                          bind:value={maxCacheWriteCost}
+                          disabled={maxCacheWriteCap === 0}
+                          oninput={applyFilters}
+                        />
+                        <span class="range-value"
+                          >{formatCost(maxCacheWriteCost, t.freeLabel)}</span
+                        >
+                      </div>
+                      <div class="range-row">
+                        <span class="range-sub-label">{t.labelReasoning}</span>
+                        <input
+                          type="range"
+                          min="0"
+                          max={maxReasoningCap}
+                          step="0.0001"
+                          bind:value={maxReasoningCost}
+                          disabled={maxReasoningCap === 0}
+                          oninput={applyFilters}
+                        />
+                        <span class="range-value"
+                          >{formatCost(maxReasoningCost, t.freeLabel)}</span
+                        >
+                      </div>
+                      <div class="range-row">
+                        <span class="range-sub-label">{t.labelAudioIn}</span>
+                        <input
+                          type="range"
+                          min="0"
+                          max={maxInputAudioCap}
+                          step="0.0001"
+                          bind:value={maxInputAudioCost}
+                          disabled={maxInputAudioCap === 0}
+                          oninput={applyFilters}
+                        />
+                        <span class="range-value"
+                          >{formatCost(maxInputAudioCost, t.freeLabel)}</span
+                        >
+                      </div>
+                      <div class="range-row">
+                        <span class="range-sub-label">{t.labelAudioOut}</span>
+                        <input
+                          type="range"
+                          min="0"
+                          max={maxOutputAudioCap}
+                          step="0.0001"
+                          bind:value={maxOutputAudioCost}
+                          disabled={maxOutputAudioCap === 0}
+                          oninput={applyFilters}
+                        />
+                        <span class="range-value"
+                          >{formatCost(maxOutputAudioCost, t.freeLabel)}</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="filter-group">
+                <div class="filter-group-title">{t.groupLimits}</div>
+                <div class="filter-group-body">
+                  <div class="filter-item filter-context">
+                    <div class="compact-range stacked">
+                      <span class="range-label">{t.labelContextOutput}:</span>
+                      <div class="range-row">
+                        <span class="range-sub-label">{t.tableContext}</span>
+                        <input
+                          type="range"
+                          min="0"
+                          max={maxContextModel}
+                          step="1000"
+                          bind:value={minContext}
+                          oninput={applyFilters}
+                        />
+                        <span class="range-value"
+                          >{formatNumber(minContext)}</span
+                        >
+                      </div>
+                      <div class="range-row">
+                        <span class="range-sub-label">{t.tableOutput}</span>
+                        <input
+                          type="range"
+                          min="0"
+                          max={maxOutputModel}
+                          step="1000"
+                          bind:value={minOutput}
+                          oninput={applyFilters}
+                        />
+                        <span class="range-value"
+                          >{formatNumber(minOutput)}</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="filter-group">
+                <div class="filter-group-title">{t.groupCapabilities}</div>
+                <div class="filter-group-body">
+                  <div class="filter-item filter-features">
+                    <div class="feature-tags">
+                      <button
+                        class="feature-tag"
+                        class:active={features.vision === true}
+                        class:inactive={features.vision === false}
+                        onclick={() => {
+                          features.vision =
+                            features.vision === true
+                              ? false
+                              : features.vision === false
+                                ? null
+                                : true;
+                          applyFilters();
+                        }}
+                      >
+                        {t.featureVision}
+                      </button>
+                      <button
+                        class="feature-tag"
+                        class:active={features.audio === true}
+                        class:inactive={features.audio === false}
+                        onclick={() => {
+                          features.audio =
+                            features.audio === true
+                              ? false
+                              : features.audio === false
+                                ? null
+                                : true;
+                          applyFilters();
+                        }}
+                      >
+                        {t.featureAudio}
+                      </button>
+                      <button
+                        class="feature-tag"
+                        class:active={features.video === true}
+                        class:inactive={features.video === false}
+                        onclick={() => {
+                          features.video =
+                            features.video === true
+                              ? false
+                              : features.video === false
+                                ? null
+                                : true;
+                          applyFilters();
+                        }}
+                      >
+                        {t.featureVideo}
+                      </button>
+                      <button
+                        class="feature-tag"
+                        class:active={features.code === true}
+                        class:inactive={features.code === false}
+                        onclick={() => {
+                          features.code =
+                            features.code === true
+                              ? false
+                              : features.code === false
+                                ? null
+                                : true;
+                          applyFilters();
+                        }}
+                      >
+                        {t.featureCode}
+                      </button>
+                      <button
+                        class="feature-tag"
+                        class:active={features.reasoning === true}
+                        class:inactive={features.reasoning === false}
+                        onclick={() => {
+                          features.reasoning =
+                            features.reasoning === true
+                              ? false
+                              : features.reasoning === false
+                                ? null
+                                : true;
+                          applyFilters();
+                        }}
+                      >
+                        {t.featureReasoning}
+                      </button>
+                      <button
+                        class="feature-tag"
+                        class:active={features.toolCall === true}
+                        class:inactive={features.toolCall === false}
+                        onclick={() => {
+                          features.toolCall =
+                            features.toolCall === true
+                              ? false
+                              : features.toolCall === false
+                                ? null
+                                : true;
+                          applyFilters();
+                        }}
+                      >
+                        {t.featureTool}
+                      </button>
+                      <button
+                        class="feature-tag"
+                        class:active={features.structuredOutput === true}
+                        class:inactive={features.structuredOutput === false}
+                        onclick={() => {
+                          features.structuredOutput =
+                            features.structuredOutput === true
+                              ? false
+                              : features.structuredOutput === false
+                                ? null
+                                : true;
+                          applyFilters();
+                        }}
+                      >
+                        {t.featureStruct}
+                      </button>
+                      <button
+                        class="feature-tag"
+                        class:active={features.temperature === true}
+                        class:inactive={features.temperature === false}
+                        onclick={() => {
+                          features.temperature =
+                            features.temperature === true
+                              ? false
+                              : features.temperature === false
+                                ? null
+                                : true;
+                          applyFilters();
+                        }}
+                      >
+                        {t.featureTemp}
+                      </button>
+                      <label class="feature-checkbox">
+                        <input
+                          type="checkbox"
+                          bind:checked={openWeightsOnly}
+                          onchange={applyFilters}
+                        />
+                        <span>{t.featureOpen}</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="filter-group">
+                <div class="filter-group-title">{t.groupMetadata}</div>
+                <div class="filter-group-body">
+                  <div class="filter-item filter-release">
+                    <label class="range-label" for="release-date"
+                      >{t.labelReleasedAfter}:</label
                     >
-                      {t.tableInput}
-                      {#if sortBy === "cost-input"}{sortOrder === "asc"
-                          ? "↓"
-                          : "↑"}{/if}
-                    </th>
-                  {/if}
-                  {#if availableFields.find((f) => f.id === "costOutput")?.visible}
-                    <th
-                      class="sortable"
-                      onclick={() => toggleSort("cost-output")}
-                    >
-                      {t.tableOutput}
-                      {#if sortBy === "cost-output"}{sortOrder === "asc"
-                          ? "↓"
-                          : "↑"}{/if}
-                    </th>
-                  {/if}
-                  {#if availableFields.find((f) => f.id === "context")?.visible}
-                    <th class="sortable" onclick={() => toggleSort("context")}>
-                      {t.tableContext}
-                      {#if sortBy === "context"}{sortOrder === "asc"
-                          ? "↓"
-                          : "↑"}{/if}
-                    </th>
-                  {/if}
-                  {#if availableFields.find((f) => f.id === "output")?.visible}
-                    <th>{t.tableOutput}</th>
-                  {/if}
-                  {#if availableFields.find((f) => f.id === "cacheRead")?.visible}
-                    <th>{t.tableCacheRead}</th>
-                  {/if}
-                  {#if availableFields.find((f) => f.id === "cacheWrite")?.visible}
-                    <th>{t.tableCacheWrite}</th>
-                  {/if}
-                  {#if availableFields.find((f) => f.id === "reasoning")?.visible}
-                    <th>{t.tableReasoning}</th>
-                  {/if}
-                  {#if availableFields.find((f) => f.id === "features")?.visible}
-                    <th>{t.tableFeatures}</th>
-                  {/if}
-                  {#if availableFields.find((f) => f.id === "releaseDate")?.visible}
-                    <th class="sortable" onclick={() => toggleSort("date")}>
-                      {t.tableReleased}
-                      {#if sortBy === "date"}{sortOrder === "asc"
-                          ? "↓"
-                          : "↑"}{/if}
-                    </th>
-                  {/if}
-                  {#if availableFields.find((f) => f.id === "structuredOutput")?.visible}
-                    <th>{t.tableStruct}</th>
-                  {/if}
-                  {#if availableFields.find((f) => f.id === "temperature")?.visible}
-                    <th>{t.tableTemp}</th>
-                  {/if}
-                  {#if availableFields.find((f) => f.id === "interleaved")?.visible}
-                    <th>{t.tableInter}</th>
-                  {/if}
-                  {#if availableFields.find((f) => f.id === "knowledge")?.visible}
-                    <th>{t.tableKnowledge}</th>
-                  {/if}
-                  {#if availableFields.find((f) => f.id === "id")?.visible}
-                    <th>{t.tableId}</th>
-                  {/if}
-                </tr>
-              </thead>
-              <tbody>
-                {#each displayModels as model (model.id)}
-                  <tr class="model-row">
-                    {#if availableFields.find((f) => f.id === "name")?.visible}
-                      <td class="model-name-cell">
-                        <div class="model-name-content">
-                          <h4>{model.name}</h4>
-                          {#if model.properties.features.openWeights}
-                            <span class="open-weights-badge-mini"
-                              >{t.featureOpen}</span
-                            >
-                          {/if}
-                        </div>
-                      </td>
-                    {/if}
-                    {#if availableFields.find((f) => f.id === "provider")?.visible}
-                      <td class="provider-cell">
-                        <span class="provider-tag">{model.provider}</span>
-                      </td>
-                    {/if}
-                    {#if availableFields.find((f) => f.id === "family")?.visible}
-                      <td class="family-cell">{model.properties.family}</td>
-                    {/if}
-                    {#if availableFields.find((f) => f.id === "costInput")?.visible}
-                      <td class="cost-cell input-cost"
-                        >{formatCost(
-                          model.properties.cost.input,
-                          t.freeLabel,
-                        )}</td
-                      >
-                    {/if}
-                    {#if availableFields.find((f) => f.id === "costOutput")?.visible}
-                      <td class="cost-cell output-cost"
-                        >{formatCost(
-                          model.properties.cost.output,
-                          t.freeLabel,
-                        )}</td
-                      >
-                    {/if}
-                    {#if availableFields.find((f) => f.id === "context")?.visible}
-                      <td class="context-cell"
-                        >{formatNumber(model.properties.limit.context)}</td
-                      >
-                    {/if}
-                    {#if availableFields.find((f) => f.id === "output")?.visible}
-                      <td class="output-cell"
-                        >{formatNumber(model.properties.limit.output)}</td
-                      >
-                    {/if}
-                    {#if availableFields.find((f) => f.id === "cacheRead")?.visible}
-                      <td class="cost-cell"
-                        >{model.properties.cost.cache_read
-                          ? formatCost(
-                              model.properties.cost.cache_read,
-                              t.freeLabel,
-                            )
-                          : "-"}</td
-                      >
-                    {/if}
-                    {#if availableFields.find((f) => f.id === "cacheWrite")?.visible}
-                      <td class="cost-cell"
-                        >{model.properties.cost.cache_write
-                          ? formatCost(
-                              model.properties.cost.cache_write,
-                              t.freeLabel,
-                            )
-                          : "-"}</td
-                      >
-                    {/if}
-                    {#if availableFields.find((f) => f.id === "reasoning")?.visible}
-                      <td class="cost-cell"
-                        >{model.properties.cost.reasoning
-                          ? formatCost(
-                              model.properties.cost.reasoning,
-                              t.freeLabel,
-                            )
-                          : "-"}</td
-                      >
-                    {/if}
-                    {#if availableFields.find((f) => f.id === "features")?.visible}
-                      <td class="features-cell">
-                        <div class="features-list">
-                          {#if model.properties.features.vision}
-                            <span
-                              class="feature-icon vision"
-                              title={t.featureVision}>👁️</span
-                            >
-                          {/if}
-                          {#if model.properties.features.audio}
-                            <span
-                              class="feature-icon audio"
-                              title={t.featureAudio}>🔊</span
-                            >
-                          {/if}
-                          {#if model.properties.features.video}
-                            <span
-                              class="feature-icon video"
-                              title={t.featureVideo}>🎬</span
-                            >
-                          {/if}
-                          {#if model.properties.features.code}
-                            <span
-                              class="feature-icon code"
-                              title={t.featureCode}>💻</span
-                            >
-                          {/if}
-                          {#if model.properties.features.reasoning}
-                            <span
-                              class="feature-icon reasoning"
-                              title={t.featureReasoning}>🧠</span
-                            >
-                          {/if}
-                          {#if model.properties.features.toolCall}
-                            <span
-                              class="feature-icon tool-call"
-                              title={t.featureTool}>🔧</span
-                            >
-                          {/if}
-                        </div>
-                      </td>
-                    {/if}
-                    {#if availableFields.find((f) => f.id === "releaseDate")?.visible}
-                      <td class="date-cell"
-                        >{formatDate(model.properties.releaseDate, locale)}</td
-                      >
-                    {/if}
-                    {#if availableFields.find((f) => f.id === "structuredOutput")?.visible}
-                      <td class="bool-cell">
-                        {#if model.properties.features.structuredOutput}
-                          <span class="bool-yes">✓</span>
-                        {:else}
-                          <span class="bool-no">-</span>
-                        {/if}
-                      </td>
-                    {/if}
-                    {#if availableFields.find((f) => f.id === "temperature")?.visible}
-                      <td class="bool-cell">
-                        {#if model.properties.features.temperature}
-                          <span class="bool-yes">✓</span>
-                        {:else}
-                          <span class="bool-no">-</span>
-                        {/if}
-                      </td>
-                    {/if}
-                    {#if availableFields.find((f) => f.id === "interleaved")?.visible}
-                      <td class="interleaved-cell">
-                        {#if model.properties.interleaved}
-                          <span class="interleaved-badge"
-                            >{model.properties.interleaved.field}</span
-                          >
-                        {:else}
-                          -
-                        {/if}
-                      </td>
-                    {/if}
-                    {#if availableFields.find((f) => f.id === "knowledge")?.visible}
-                      <td class="knowledge-cell"
-                        >{model.properties.knowledge || "-"}</td
-                      >
-                    {/if}
-                    {#if availableFields.find((f) => f.id === "id")?.visible}
-                      <td class="id-cell">
-                        <code class="model-id">{model.modelId}</code>
-                      </td>
-                    {/if}
-                  </tr>
-                {/each}
-              </tbody>
-            </table>
+                    <input
+                      id="release-date"
+                      type="date"
+                      bind:value={minReleaseDate}
+                      class="date-input compact"
+                      onchange={applyFilters}
+                    />
+                  </div>
+                  <div class="filter-item filter-flags">
+                    <label class="feature-checkbox">
+                      <input
+                        type="checkbox"
+                        bind:checked={knowledgeOnly}
+                        onchange={applyFilters}
+                      />
+                      <span>{t.labelHasKnowledge}</span>
+                    </label>
+                    <label class="feature-checkbox">
+                      <input
+                        type="checkbox"
+                        bind:checked={interleavedOnly}
+                        onchange={applyFilters}
+                      />
+                      <span>{t.labelInterleaved}</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       {/if}
-    </div>
-  {/if}
 
-  <footer class="site-footer">
+      <div class="results min-h-[50vh]">
+        <div class="results-header">
+          <div class="results-title">
+            <h2>{getResultsFoundLabel(displayModels.length)}</h2>
+          </div>
+          <div class="results-actions">
+            <div class="field-selector">
+              <button
+                class="field-selector-toggle min-h-[44px] px-3 py-2"
+                onclick={() => (showFieldSelector = !showFieldSelector)}
+              >
+                <span class="field-icon">⚙</span>
+                <span
+                  >{getColumnsLabel(
+                    availableFields.filter((f) => f.visible).length,
+                  )}</span
+                >
+                <span class="dropdown-arrow"
+                  >{showFieldSelector ? "▲" : "▼"}</span
+                >
+              </button>
+              {#if showFieldSelector}
+                <div class="field-selector-dropdown">
+                  <div class="field-selector-actions">
+                    <button
+                      class="action-btn small min-h-[44px] px-3 py-2"
+                      onclick={showAllFields}>{t.showAll}</button
+                    >
+                    <button
+                      class="action-btn small min-h-[44px] px-3 py-2"
+                      onclick={hideAllFields}>{t.hideAll}</button
+                    >
+                  </div>
+                  <div class="field-list">
+                    {#each availableFields as field}
+                      <label class="field-item" class:visible={field.visible}>
+                        <input
+                          type="checkbox"
+                          checked={field.visible}
+                          onchange={() => toggleFieldVisibility(field.id)}
+                        />
+                        <span>{getFieldLabel(field)}</span>
+                      </label>
+                    {/each}
+                  </div>
+                </div>
+              {/if}
+            </div>
+            <button
+              class="reset-btn min-h-[44px] px-3 py-2"
+              type="button"
+              onclick={resetFilters}
+            >
+              {t.resetFilters}
+            </button>
+            <div class="sort-controls">
+              <label class="sr-only" for="sort-select">{t.sortLabel}</label>
+              <select
+                id="sort-select"
+                class="sort-select min-h-[44px] px-3 py-2"
+                bind:value={sortBy}
+                aria-label={t.sortLabel}
+              >
+                <option value="name">{t.sortName}</option>
+                <option value="provider">{t.sortProvider}</option>
+                <option value="family">{t.sortFamily}</option>
+                <option value="cost-input">{t.sortInputCost}</option>
+                <option value="cost-output">{t.sortOutputCost}</option>
+                <option value="context">{t.sortContext}</option>
+                <option value="date">{t.sortReleaseDate}</option>
+              </select>
+              <button
+                class="sort-order-btn min-h-[44px] px-3 py-2"
+                onclick={() => {
+                  sortOrder = sortOrder === "asc" ? "desc" : "asc";
+                }}
+              >
+                {sortOrder === "asc" ? `↓ ${t.sortAsc}` : `↑ ${t.sortDesc}`}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {#if displayModels.length === 0}
+          <div class="no-results">
+            <h3>{t.noResultsTitle}</h3>
+            <p>{t.noResultsBody}</p>
+          </div>
+        {:else}
+          <div class="table-scroll-wrapper">
+            <!-- 表格容器：独立的滚动区域 -->
+            <div
+              class="table-container"
+              bind:this={tableContainer}
+              onscroll={handleHorizontalScroll}
+            >
+              <table class="models-table">
+                <thead>
+                  <tr>
+                    {#if availableFields.find((f) => f.id === "name")?.visible}
+                      <th class="sortable" onclick={() => toggleSort("name")}>
+                        {t.tableName}
+                        {#if sortBy === "name"}{sortOrder === "asc"
+                            ? "↓"
+                            : "↑"}{/if}
+                      </th>
+                    {/if}
+                    {#if availableFields.find((f) => f.id === "provider")?.visible}
+                      <th
+                        class="sortable"
+                        onclick={() => toggleSort("provider")}
+                      >
+                        {t.tableProvider}
+                        {#if sortBy === "provider"}{sortOrder === "asc"
+                            ? "↓"
+                            : "↑"}{/if}
+                      </th>
+                    {/if}
+                    {#if availableFields.find((f) => f.id === "family")?.visible}
+                      <th class="sortable" onclick={() => toggleSort("family")}>
+                        {t.tableFamily}
+                        {#if sortBy === "family"}{sortOrder === "asc"
+                            ? "↓"
+                            : "↑"}{/if}
+                      </th>
+                    {/if}
+                    {#if availableFields.find((f) => f.id === "costInput")?.visible}
+                      <th
+                        class="sortable"
+                        onclick={() => toggleSort("cost-input")}
+                      >
+                        {t.tableInput}
+                        {#if sortBy === "cost-input"}{sortOrder === "asc"
+                            ? "↓"
+                            : "↑"}{/if}
+                      </th>
+                    {/if}
+                    {#if availableFields.find((f) => f.id === "costOutput")?.visible}
+                      <th
+                        class="sortable"
+                        onclick={() => toggleSort("cost-output")}
+                      >
+                        {t.tableOutput}
+                        {#if sortBy === "cost-output"}{sortOrder === "asc"
+                            ? "↓"
+                            : "↑"}{/if}
+                      </th>
+                    {/if}
+                    {#if availableFields.find((f) => f.id === "context")?.visible}
+                      <th
+                        class="sortable"
+                        onclick={() => toggleSort("context")}
+                      >
+                        {t.tableContext}
+                        {#if sortBy === "context"}{sortOrder === "asc"
+                            ? "↓"
+                            : "↑"}{/if}
+                      </th>
+                    {/if}
+                    {#if availableFields.find((f) => f.id === "output")?.visible}
+                      <th>{t.tableOutput}</th>
+                    {/if}
+                    {#if availableFields.find((f) => f.id === "cacheRead")?.visible}
+                      <th>{t.tableCacheRead}</th>
+                    {/if}
+                    {#if availableFields.find((f) => f.id === "cacheWrite")?.visible}
+                      <th>{t.tableCacheWrite}</th>
+                    {/if}
+                    {#if availableFields.find((f) => f.id === "reasoning")?.visible}
+                      <th>{t.tableReasoning}</th>
+                    {/if}
+                    {#if availableFields.find((f) => f.id === "features")?.visible}
+                      <th>{t.tableFeatures}</th>
+                    {/if}
+                    {#if availableFields.find((f) => f.id === "releaseDate")?.visible}
+                      <th class="sortable" onclick={() => toggleSort("date")}>
+                        {t.tableReleased}
+                        {#if sortBy === "date"}{sortOrder === "asc"
+                            ? "↓"
+                            : "↑"}{/if}
+                      </th>
+                    {/if}
+                    {#if availableFields.find((f) => f.id === "structuredOutput")?.visible}
+                      <th>{t.tableStruct}</th>
+                    {/if}
+                    {#if availableFields.find((f) => f.id === "temperature")?.visible}
+                      <th>{t.tableTemp}</th>
+                    {/if}
+                    {#if availableFields.find((f) => f.id === "interleaved")?.visible}
+                      <th>{t.tableInter}</th>
+                    {/if}
+                    {#if availableFields.find((f) => f.id === "knowledge")?.visible}
+                      <th>{t.tableKnowledge}</th>
+                    {/if}
+                    {#if availableFields.find((f) => f.id === "id")?.visible}
+                      <th>{t.tableId}</th>
+                    {/if}
+                  </tr>
+                </thead>
+                <tbody>
+                  {#each displayModels as model (model.id)}
+                    <tr class="model-row">
+                      {#if availableFields.find((f) => f.id === "name")?.visible}
+                        <td class="model-name-cell">
+                          <div class="model-name-content">
+                            <h3>{model.name}</h3>
+                            {#if model.properties.features.openWeights}
+                              <span class="open-weights-badge-mini"
+                                >{t.featureOpen}</span
+                              >
+                            {/if}
+                          </div>
+                        </td>
+                      {/if}
+                      {#if availableFields.find((f) => f.id === "provider")?.visible}
+                        <td class="provider-cell">
+                          <span class="provider-tag">{model.provider}</span>
+                        </td>
+                      {/if}
+                      {#if availableFields.find((f) => f.id === "family")?.visible}
+                        <td class="family-cell">{model.properties.family}</td>
+                      {/if}
+                      {#if availableFields.find((f) => f.id === "costInput")?.visible}
+                        <td class="cost-cell input-cost"
+                          >{formatCost(
+                            model.properties.cost.input,
+                            t.freeLabel,
+                          )}</td
+                        >
+                      {/if}
+                      {#if availableFields.find((f) => f.id === "costOutput")?.visible}
+                        <td class="cost-cell output-cost"
+                          >{formatCost(
+                            model.properties.cost.output,
+                            t.freeLabel,
+                          )}</td
+                        >
+                      {/if}
+                      {#if availableFields.find((f) => f.id === "context")?.visible}
+                        <td class="context-cell"
+                          >{formatNumber(model.properties.limit.context)}</td
+                        >
+                      {/if}
+                      {#if availableFields.find((f) => f.id === "output")?.visible}
+                        <td class="output-cell"
+                          >{formatNumber(model.properties.limit.output)}</td
+                        >
+                      {/if}
+                      {#if availableFields.find((f) => f.id === "cacheRead")?.visible}
+                        <td class="cost-cell"
+                          >{model.properties.cost.cache_read
+                            ? formatCost(
+                                model.properties.cost.cache_read,
+                                t.freeLabel,
+                              )
+                            : "-"}</td
+                        >
+                      {/if}
+                      {#if availableFields.find((f) => f.id === "cacheWrite")?.visible}
+                        <td class="cost-cell"
+                          >{model.properties.cost.cache_write
+                            ? formatCost(
+                                model.properties.cost.cache_write,
+                                t.freeLabel,
+                              )
+                            : "-"}</td
+                        >
+                      {/if}
+                      {#if availableFields.find((f) => f.id === "reasoning")?.visible}
+                        <td class="cost-cell"
+                          >{model.properties.cost.reasoning
+                            ? formatCost(
+                                model.properties.cost.reasoning,
+                                t.freeLabel,
+                              )
+                            : "-"}</td
+                        >
+                      {/if}
+                      {#if availableFields.find((f) => f.id === "features")?.visible}
+                        <td class="features-cell">
+                          <div class="features-list">
+                            {#if model.properties.features.vision}
+                              <span
+                                class="feature-icon vision"
+                                title={t.featureVision}>👁️</span
+                              >
+                            {/if}
+                            {#if model.properties.features.audio}
+                              <span
+                                class="feature-icon audio"
+                                title={t.featureAudio}>🔊</span
+                              >
+                            {/if}
+                            {#if model.properties.features.video}
+                              <span
+                                class="feature-icon video"
+                                title={t.featureVideo}>🎬</span
+                              >
+                            {/if}
+                            {#if model.properties.features.code}
+                              <span
+                                class="feature-icon code"
+                                title={t.featureCode}>💻</span
+                              >
+                            {/if}
+                            {#if model.properties.features.reasoning}
+                              <span
+                                class="feature-icon reasoning"
+                                title={t.featureReasoning}>🧠</span
+                              >
+                            {/if}
+                            {#if model.properties.features.toolCall}
+                              <span
+                                class="feature-icon tool-call"
+                                title={t.featureTool}>🔧</span
+                              >
+                            {/if}
+                          </div>
+                        </td>
+                      {/if}
+                      {#if availableFields.find((f) => f.id === "releaseDate")?.visible}
+                        <td class="date-cell"
+                          >{formatDate(
+                            model.properties.releaseDate,
+                            locale,
+                          )}</td
+                        >
+                      {/if}
+                      {#if availableFields.find((f) => f.id === "structuredOutput")?.visible}
+                        <td class="bool-cell">
+                          {#if model.properties.features.structuredOutput}
+                            <span class="bool-yes">✓</span>
+                          {:else}
+                            <span class="bool-no">-</span>
+                          {/if}
+                        </td>
+                      {/if}
+                      {#if availableFields.find((f) => f.id === "temperature")?.visible}
+                        <td class="bool-cell">
+                          {#if model.properties.features.temperature}
+                            <span class="bool-yes">✓</span>
+                          {:else}
+                            <span class="bool-no">-</span>
+                          {/if}
+                        </td>
+                      {/if}
+                      {#if availableFields.find((f) => f.id === "interleaved")?.visible}
+                        <td class="interleaved-cell">
+                          {#if model.properties.interleaved}
+                            <span class="interleaved-badge"
+                              >{model.properties.interleaved.field}</span
+                            >
+                          {:else}
+                            -
+                          {/if}
+                        </td>
+                      {/if}
+                      {#if availableFields.find((f) => f.id === "knowledge")?.visible}
+                        <td class="knowledge-cell"
+                          >{model.properties.knowledge || "-"}</td
+                        >
+                      {/if}
+                      {#if availableFields.find((f) => f.id === "id")?.visible}
+                        <td class="id-cell">
+                          <code class="model-id">{model.modelId}</code>
+                        </td>
+                      {/if}
+                    </tr>
+                  {/each}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        {/if}
+      </div>
+    {/if}
+  </main>
+
+  <footer class="site-footer min-h-[72px]">
     <div class="footer-meta">
       <span>{t.footerBuiltOn}</span>
       <a
+        class="inline-flex min-h-[44px] items-center"
         href="https://github.com/anomalyco/models.dev"
         target="_blank"
         rel="noreferrer"
@@ -1360,8 +1913,11 @@
     </div>
     <div class="footer-meta">
       <span>{t.footerFriends}:</span>
-      <a href="https://onlinestool.com" target="_blank" rel="noreferrer"
-        >onlinestool.com</a
+      <a
+        class="inline-flex min-h-[44px] items-center"
+        href="https://onlinestool.com"
+        target="_blank"
+        rel="noreferrer">onlinestool.com</a
       >
     </div>
   </footer>
@@ -1709,7 +2265,13 @@
     position: relative;
   }
 
-  .filter-cost-advanced {
+  .filter-cost {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .filter-cost-extended {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -1910,12 +2472,13 @@
 
   .provider-dropdown {
     position: relative;
+    z-index: 50;
   }
 
   .dropdown-content {
-    position: fixed;
-    top: auto;
-    left: auto;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
     width: auto;
     min-width: 280px;
     max-width: 360px;
@@ -1923,7 +2486,7 @@
     border: 1px solid var(--fluent-border);
     border-radius: var(--fluent-radius-sm);
     box-shadow: var(--fluent-shadow);
-    z-index: 2147483646;
+    z-index: 100;
     max-height: 420px;
     display: flex;
     flex-direction: column;
