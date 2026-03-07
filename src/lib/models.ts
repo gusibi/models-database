@@ -8,24 +8,35 @@ let modelsData: ModelData | null = null;
 export async function loadModels(): Promise<ModelData> {
   if (modelsData) return modelsData;
 
-  const url = import.meta.env.PUBLIC_MODELS_URL ?? `${base}/models.json`;
+  const url = `https://r2.eztoolab.com/models/models.json`;
+  // console.log("models url", url);
 
   // 添加日期字符串参数（YYYY-MM-DD格式），保证每天至少更新一次缓存，解决 R2 等默认缓存问题
   const dateStr = new Date().toISOString().split('T')[0];
   const fetchUrl = url.includes('?') ? `${url}&t=${dateStr}` : `${url}?t=${dateStr}`;
 
-  const response = await fetch(fetchUrl);
-  if (!response.ok) throw new Error(`Failed to load models: ${response.status}`);
-  const data: ModelData = await response.json();
-  modelsData = data;
-  return modelsData;
+  try {
+    const response = await fetch(fetchUrl);
+    if (!response.ok) throw new Error(`Failed to load models: ${response.status}`);
+    const data: ModelData = await response.json();
+    modelsData = data;
+    return modelsData;
+  } catch (error) {
+    console.error("Fetch models error:", error);
+    throw error;
+  }
 }
+
 
 export function getAllModels(data: ModelData): Model[] {
   const models: Model[] = [];
 
   for (const [providerId, provider] of Object.entries(data)) {
+    if (!provider || !provider.models) continue;
+
     for (const model of Object.values(provider.models)) {
+      if (!model) continue;
+
       const family = model.family || 'unknown';
       const modalities = model.modalities || { input: [], output: [] };
       const uniqueId = `${providerId}-${model.id}`;
@@ -74,10 +85,17 @@ export function getModelsByProvider(data: ModelData, providerId: string): Model[
 
 export function getUniqueProviders(data: ModelData): { id: string; name: string }[] {
   if (!data) return [];
-  return Object.entries(data).map(([key, p]) => ({
-    id: p?.id ?? key,
-    name: p?.name ?? key
-  }));
+
+  const providers: { id: string; name: string }[] = [];
+  for (const [key, p] of Object.entries(data)) {
+    if (!p) continue; // Skip invalid providers
+    providers.push({
+      id: p.id ?? key,
+      name: p.name ?? key
+    });
+  }
+
+  return providers;
 }
 
 export function filterModels(models: Model[], options: FilterOptions): Model[] {

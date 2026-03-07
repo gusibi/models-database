@@ -323,7 +323,7 @@
       const data = await loadModels();
       models = getAllModels(data);
       allProviders = getUniqueProviders(data);
-      console.log("Loaded providers:", allProviders.length, allProviders);
+      // console.log("Loaded providers:", allProviders.length, allProviders);
       selectedProviders = allProviders.map((p) => p.id);
 
       const maxCost = getMaxCost(models);
