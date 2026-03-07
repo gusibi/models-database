@@ -7,9 +7,14 @@ let modelsData: ModelData | null = null;
 
 export async function loadModels(): Promise<ModelData> {
   if (modelsData) return modelsData;
-  
+
   const url = import.meta.env.PUBLIC_MODELS_URL ?? `${base}/models.json`;
-  const response = await fetch(url);
+
+  // 添加日期字符串参数（YYYY-MM-DD格式），保证每天至少更新一次缓存，解决 R2 等默认缓存问题
+  const dateStr = new Date().toISOString().split('T')[0];
+  const fetchUrl = url.includes('?') ? `${url}&t=${dateStr}` : `${url}?t=${dateStr}`;
+
+  const response = await fetch(fetchUrl);
   if (!response.ok) throw new Error(`Failed to load models: ${response.status}`);
   const data: ModelData = await response.json();
   modelsData = data;
@@ -18,13 +23,13 @@ export async function loadModels(): Promise<ModelData> {
 
 export function getAllModels(data: ModelData): Model[] {
   const models: Model[] = [];
-  
+
   for (const [providerId, provider] of Object.entries(data)) {
     for (const model of Object.values(provider.models)) {
       const family = model.family || 'unknown';
       const modalities = model.modalities || { input: [], output: [] };
       const uniqueId = `${providerId}-${model.id}`;
-      
+
       models.push({
         provider: provider.name,
         providerId: provider.id,
@@ -56,14 +61,14 @@ export function getAllModels(data: ModelData): Model[] {
       });
     }
   }
-  
+
   return models;
 }
 
 export function getModelsByProvider(data: ModelData, providerId: string): Model[] {
   const provider = data[providerId];
   if (!provider) return [];
-  
+
   return getAllModels({ [providerId]: provider });
 }
 
